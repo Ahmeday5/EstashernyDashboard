@@ -1,0 +1,114 @@
+/*******************search***********/
+
+.search-container {
+  max-width: 80%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.form-control {
+  border-radius: 10px;
+  padding: 10px 40px 10px 20px; /* مساحة إضافية للأيقونة */
+  border: 3px solid var(--second-color);
+  font-size: 20px;
+  height: 45px;
+  box-shadow: none;
+  background: var(--thrid-color);
+}
+
+.form-control:focus {
+  border-color: var(--second-color);
+  box-shadow: none;
+  outline: none;
+}
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  cursor: pointer;
+}
+
+/*******************alert*************************/
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.icons-alert {
+  height: 50px;
+  width: 50px;
+  margin-left: 7px;
+}
+
+.title-alert {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--second-color);
+}
+
+/**************table********************/
+
+.custom-table {
+  border-collapse: separate;
+  /* لفصل الصفوف */
+  border-spacing: 0 8px;
+  /* مسافة بين الصفوف */
+  width: 100%;
+
+  font-size: 18px;
+}
+
+.custom-table th,
+.custom-table td {
+  text-align: center;
+  border-right: 2px solid var(--second-color);
+  border-bottom: 2px solid var(--second-color);
+  vertical-align: middle;
+  padding: 10px;
+}
+
+.custom-table th:last-child,
+.custom-table td:last-child {
+  border-left: 2px solid var(--second-color);
+}
+
+.custom-table thead th {
+  background-color: var(--thrid-color);
+  color: var(--second-color);
+  font-weight: bold;
+  border-top: 2px solid var(--second-color);
+}
+
+.custom-table tbody td {
+  background-color: var(--thrid-color);
+  color: var(--second-color);
+  font-weight: bold;
+  border-top: 2px solid var(--second-color);
+}
+
+.custom-table tbody tr td:first-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.custom-table tbody tr td:last-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+.custom-table thead tr th:first-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.custom-table thead tr th:last-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+/*********responsive************/
+
+@media (max-width: 992px) {
+  .custom-table {
+    font-size: 12px;
+  }
+}

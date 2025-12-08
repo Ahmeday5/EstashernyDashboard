@@ -1,0 +1,18 @@
+<div class="container-fluid mb-4">
+  <header class="header">
+    <div class="row d-flex" dir="ltr">
+      <div class="col-md-6 d-flex align-content-center align-items-center">
+        <div class="imgs">
+          <img [src]="userImage" alt="User Image" class="img-fluid rounded-circle" onerror="this.src='/assets/img/header/logo.png';">
+        </div>
+        <!-- الصورة بتستخدم src ديناميكي من userImage
+        onerror بيحل مشكلة لو الصورة مش موجودة أو فشل تحميلها -->
+        <div class="username mt-4">
+          <h6>{{ username }}</h6>
+          <!-- العلامة h1 بتعرض الاسم المخزن في المتغير username -->
+          <!-- عرض الصورة الشخصية أو الصورة الافتراضية -->
+        </div>
+      </div>
+    </div>
+  </header>
+</div>

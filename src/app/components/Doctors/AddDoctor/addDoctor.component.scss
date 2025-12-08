@@ -1,0 +1,135 @@
+.container {
+  padding-bottom: 20px;
+}
+
+.page-title {
+  background-color: var(--second-color);
+  color: var(--thrid-color);
+  width: 32%;
+  padding: 10px;
+  text-align: center;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.certificate {
+  position: relative;
+}
+
+.validcertificate {
+  position: absolute;
+  left: 65%;
+  top: 96%;
+}
+
+.validphoto {
+  position: absolute;
+}
+
+form .rowright {
+  margin-top: 3px !important;
+}
+
+form .form-section {
+  margin-bottom: 15px;
+}
+
+form .certificate {
+  border: 2px solid var(--second-color);
+  padding: 4px 10px;
+  background: var(--thrid-color);
+  border-radius: 12px;
+  margin-top: 40px;
+}
+
+form .form-section .form-label {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--second-color);
+}
+
+form .form-section .form-control,
+form .form-section .form-select {
+  background: var(--thrid-color);
+  border: 2px solid var(--second-color);
+  padding: 12px 10px;
+  border-radius: 12px;
+}
+
+form .form-section .form-control:focus,
+form .form-section .form-select:focus {
+  border-color: var(--second-color);
+  box-shadow: none;
+  outline: none;
+}
+
+form .form-section .form-control::placeholder {
+  color: rgba(109, 105, 105, 1);
+  font-family: var(--font-arabic) !important;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 100%;
+}
+
+form .btn-save {
+  width: 30%;
+  background: var(--second-color);
+  color: var(--thrid-color);
+  font-size: 25px;
+  padding: 0;
+  font-weight: bold;
+  border-radius: 15px;
+}
+
+.upload-image {
+  border: none !important;
+  outline: none !important;
+  background: none;
+  padding: 0;
+}
+
+.upload-image img {
+  border: none !important;
+  outline: none !important;
+}
+
+.upload-btn {
+  border: none !important;
+  outline: none !important;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.upload-btn:focus, .upload-btn:active {
+  border: none !important;
+  outline: none !important;
+}
+
+.icons-alert {
+  width: 50px;
+  height: 50px;
+}
+
+
+@media (max-width: 1563px) {
+  .page-title {
+    width: 50%;
+  }
+}
+
+@media (max-width: 992px) {
+  .page-title {
+    width: 80%;
+  }
+
+  .validcertificate {
+    position: absolute;
+    left: 30%;
+    top: 96%;
+  }
+
+  form .certificate {
+    margin-top: 30px;
+  }
+}

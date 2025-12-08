@@ -1,0 +1,124 @@
+<div class="container-fluid mb-2">
+  <div class="row">
+    <div class="col-md-12 page-name">
+      <h1 class="page-title">مستخدم / تحميل صورة المستخدم</h1>
+    </div>
+    <!-- SVG Icons -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path
+          d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+      </symbol>
+      <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path
+          d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+      </symbol>
+    </svg>
+
+    <!-- Success and Error Messages -->
+    @if (successMessage) {
+    <div class="alert alert-success d-flex align-items-center mt-4" role="alert">
+      <svg class="bi flex-shrink-0 me-2 ms-3" width="24" height="24" role="img" aria-label="Success:">
+        <use xlink:href="#check-circle-fill" />
+      </svg>
+      <div>{{ successMessage }}</div>
+    </div>
+    }
+    @if (errorMessage) {
+    <div class="alert alert-danger d-flex align-items-center mt-4" role="alert">
+      <svg class="bi flex-shrink-0 me-2 ms-3" width="24" height="24" role="img" aria-label="Danger:">
+        <use xlink:href="#exclamation-triangle-fill" />
+      </svg>
+      <div>{{ errorMessage }}</div>
+    </div>
+    }
+
+    <!-- Form -->
+    <form #form="ngForm" (ngSubmit)="handleSubmit()" class="mt-5 needs-validation" novalidate>
+      <div class="row">
+        <div class="col-md-12">
+          <!-- رفع صورة المستخدم -->
+          <div class="text-center mb-4 position-relative">
+            <button type="button" class="rounded-circle d-inline-block upload-image" (click)="triggerFileInput()">
+              <img class="rounded-circle d-inline-block"
+                [src]="doctorImagePreview" alt="رفع الصورة"
+                style="cursor: pointer; width: 100px;" />
+            </button>
+            <input type="file" id="doctorImage" class="d-none" (change)="onImageUpload($event)" #userImage
+              accept="image/jpeg,image/png,image/jpg,image/webp,image/jfif,image"  />
+            <div class="invalid-feedback validphoto">يرجى رفع صورة صالحة</div>
+            <div class="position-absolute bottom-0 start-50 translate-middle-x" style="transform: translateY(50%);">
+              <div class="bg-white rounded-circle p-1 shadow-sm" style="width: 24px; height: 24px;">
+                <i class="fa-solid fa-arrow-up-from-bracket text-primary d-flex justify-content-center align-items-center"
+                  style="font-size: 14px;"></i>
+              </div>
+            </div>
+            <span *ngIf="user.ProfileImage" class="text-success mt-4 d-block">تم رفع الصورة: {{
+              user.ProfileImage.name }}</span>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-section">
+            <label for="validationCustom01" class="form-label"> الإسم الأول </label>
+            <input type="text" id="FirstName" class="form-control" placeholder="الإسم الأول" name="FirstName"
+              [(ngModel)]="user.FirstName" required #FirstName="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال الإسم الأول</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="email" class="form-label">الإيميل</label>
+            <input type="email" class="form-control" id="Email" name="Email" [(ngModel)]="user.Email"
+              placeholder="أدخل الإيميل" required #Email="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال إيميل صالح</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="nationalId" class="form-label">رقم الهوية</label>
+            <input type="text" class="form-control" id="NationalID" name="NationalID" [(ngModel)]="user.NationalID"
+              placeholder="الرقم" required pattern="[0-9]{14}" #NationalID="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال رقم هوية صالح (14 رقم)</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="text" class="form-label">الوظيفة</label>
+            <select class="form-select" id="Roles" name="Roles" [(ngModel)]="user.Roles" required #Roles="ngModel">
+              <option value="" disabled>اختر</option>
+              <option value="Admin">Admin</option>
+              <option value="Editor">Editor</option>
+            </select>
+            <div class="invalid-feedback">يرجى إدخال وظيفة صالحة</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-section">
+            <label for="validationCustom01" class="form-label"> الإسم الأخير </label>
+            <input type="text" id="LastName" class="form-control" placeholder="الإسم الأخير" name="LastName"
+              [(ngModel)]="user.LastName" required #LastName="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال الإسم الأخير</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="password" class="form-label">كلمة السر</label>
+            <input type="password" class="form-control" id="Password" name="Password" [(ngModel)]="user.Password"
+              placeholder="**********************" required minlength="6" #Password="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال كلمة السر (6 أحرف على الأقل)</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="phone" class="form-label">رقم التليفون</label>
+            <input type="text" class="form-control" id="Phone" name="Phone" [(ngModel)]="user.Phone" placeholder="الرقم"
+              required #Phone="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال رقم هاتف صالح</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+        </div>
+        <div class="col-12 text-center mt-4">
+          <button class="btn btn-save" type="submit">حفظ</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

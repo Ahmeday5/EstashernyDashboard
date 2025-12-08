@@ -1,0 +1,26 @@
+:root {
+  --main-color: #14c8c7;
+  --second-color: #4b4e9c;
+  --thrid-color: #f0f0f0;
+  --bg-main: #f0f0f0;
+  --font-arabic: "Noto Sans Arabic"; /* الخط العربي الافتراضي */
+  --font-latin: "Inter"; /* الخط اللاتيني الافتراضي */
+}
+
+body {
+  margin: 0 !important; /* إزالة الهوامش الافتراضية */
+  font-family: var(--font-latin) !important; /* الخط الافتراضي للنصوص العربية */
+  direction: rtl; /* اتجاه النص من اليمين للشمال */
+}
+
+.form-control:focus {
+  outline: none; /* إزالة الإطار الأزرق الافتراضي */
+  box-shadow: 0 0 5px rgba(27, 116, 187, 0.5); /* إضافة ظل خفيف كبديل للـ outline */
+}
+
+.container-fluid {
+  padding-right: 15px !important;
+  padding-left: 15px !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}

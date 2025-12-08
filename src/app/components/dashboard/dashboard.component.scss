@@ -1,0 +1,79 @@
+/****************************bg***************************/
+
+.bg {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 10px;
+  padding: 0 15px;
+  width: 80%;
+}
+
+.bg .imgs {
+  text-align: left;
+}
+
+.bg .content {
+  color: var(--thrid-color);
+}
+
+.bg .content h5 {
+  margin-bottom: 10px;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 23px;
+  line-height: 53.5px;
+}
+
+/*********************cards****************/
+.cardParent .card-body {
+  padding: 10px;
+}
+
+.cards {
+  padding: 0 30px;
+}
+
+.card {
+  border: 2px solid var(--second-color);
+  background: var(--third-color);
+  border-radius: 12px;
+}
+
+.card .icon-container {
+  margin-left: 20px; // مسافة بسيطة بين النص والأيقونة
+}
+
+.card .card-body .icon-container img {
+  width: 35px;
+}
+
+.card .card-body .text-content {
+  flex: 1; // يخلي النص ياخد المساحة المتاحة
+  color: var(--second-color);
+}
+
+.card .card-title,
+.card .card-textleft {
+  font-weight: bold;
+  font-size: 25px;
+  line-height: 100%;
+  letter-spacing: 0.5px;
+}
+
+.card .card-textleft {
+  margin: 0 15px 0 0;
+}
+
+.card .card-textright {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--main-color);
+}
+
+
+@media (max-width: 992px) {
+  .bg {
+    padding: 15px;
+  }
+}

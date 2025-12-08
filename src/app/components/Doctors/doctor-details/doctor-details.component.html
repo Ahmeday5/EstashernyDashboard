@@ -1,0 +1,100 @@
+<div class="container-fluid mt-5">
+  @if (loading) {
+  <div class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  } @else if (errorMessage) {
+  <div class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+  } @else {
+  @if (successMessage) {
+  <div class="alert alert-success text-center">
+    {{ successMessage }}
+  </div>
+  }
+  <div class="row">
+    <div class="col-md-12">
+      <div class="header-content">
+        <div class="row justify-content-between">
+          <div class="col-md-5">
+            <div class="row justify-content-between">
+              <div class="col-md-3">
+                <img [src]="doctor.doctorImage" class="img-fluid rounded-circle d-inline-block DoctorImage"
+                  alt="Doctor Image" alt="">
+              </div>
+              <div class="col-md-8">
+                <h3>د/ {{ doctor.name }}</h3>
+                <h6>{{ doctor.specialization }}</h6>
+                <div class="btns">
+                  <button class="btn btn-edit" (click)="onEdit()">تعديل</button>
+                  <button class="btn btn-delete" (click)="onDelete()">حذف</button>
+                  @if (doctor.isActive == false) {
+                  <button class="btn btn-delete" (click)="activeDoc()">تنشيط</button>
+                  }@else {
+                    <button class="btn btn-delete" (click)="inactiveDoc()">حظر</button>
+                   }
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5 text-center align-content-center">
+            <div class="experience">
+              <h1>{{ doctor.yearsOfExperience }} سنوات خبرة</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12">
+      <div class="details-doctor">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="header">
+              <h2>الملف الشخصي</h2>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="row details">
+              <div class="col-md-12 content-details">
+                <p><strong> البريد الالكتروني :</strong> {{ doctor.email }}</p>
+                <p><strong>رقم الهاتف :</strong> {{ doctor.phone }}</p>
+                <p><strong>سعر الكشف :</strong> {{ doctor.examenPrice }} جنيه</p>
+                <p></p>
+                <p class="desc"><strong>تفاصيل :</strong> {{ doctor.profileInfo }}</p>
+                <p class="desc">
+                  <strong>الشهادات :</strong>
+                  @if (isImage(doctor.doctorCertificate)) {
+                  <img [src]="doctor.doctorCertificate" alt="doctorCertificate" class="img-fluid certificate-img"
+                    (click)="openImageModal(doctor.doctorCertificate)" style="cursor: pointer; max-width: 200px;">
+                  } @else {
+                  <a [href]="doctor.doctorCertificate" target="_blank" class="btn btn-viewPdf btn-sm">عرض الملف</a>
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+  <!-- Bootstrap Modal لعرض الصورة -->
+  <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imageModalLabel">عرض الشهادة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img [src]="selectedImage" alt="Certificate" class="img-fluid">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

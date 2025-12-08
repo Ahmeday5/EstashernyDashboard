@@ -1,0 +1,26 @@
+.header {
+  height: 10vh;
+  font-family: var(--font-latin); /* الخط العربي */
+  font-weight: 600; /* وزن الخط */
+  line-height: 100%; /* ارتفاع السطر */
+  text-align: left; /* محاذاة النص لليمين */
+  padding: 10px 0;
+}
+
+.header h6 {
+  color: var(--second-color);
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.header .imgs {
+  margin-right: 15px;
+  background: transparent;
+}
+
+.header img {
+  width: 70px;
+  height: 70px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  background: var(--thrid-color) !important;
+}

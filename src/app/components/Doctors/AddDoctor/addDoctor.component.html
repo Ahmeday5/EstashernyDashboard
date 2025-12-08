@@ -1,0 +1,166 @@
+<div class="container mb-2">
+  <div class="row">
+    <div class="col-md-12 page-name">
+      <h1 class="page-title">إنشاء حسابات الأطباء</h1>
+    </div>
+    <!-- SVG Icons -->
+
+    <!-- Success and Error Messages -->
+    @if (successMessage) {
+    <div class="alert alert-success d-flex align-items-center mt-4" role="alert">
+      <svg class="bi flex-shrink-0 me-2 icons-alert" role="img" aria-label="Danger:">
+        <use xlink:href="#exclamation-triangle-fill" />
+      </svg>
+      <div class="title-alert">{{ successMessage }}</div>
+    </div>
+    }
+    @if (errorMessage) {
+    <div class="alert alert-danger d-flex align-items-center mt-4" role="alert">
+      <svg class="bi flex-shrink-0 me-2 ms-3 icons-alert" width="24" height="24" role="img" aria-label="Danger:">
+        <use xlink:href="#exclamation-triangle-fill" />
+      </svg>
+      <div class="title-alert">{{ errorMessage }}</div>
+    </div>
+    }
+
+    <!-- Form -->
+    <form #form="ngForm" (ngSubmit)="handleSubmit()" class="mt-5 needs-validation" novalidate>
+      <div class="row">
+        <div class="col-md-12">
+          <!-- رفع صورة الدكتور -->
+          <div class="text-center mb-4 position-relative">
+            <button type="button" class="rounded-circle d-inline-block upload-image" (click)="triggerFileInput()">
+              <img class="rounded-circle d-inline-block" [src]="doctorImagePreview" alt="رفع الصورة"
+                style="cursor: pointer; width: 100px;" />
+            </button>
+            <input type="file" id="doctorImage" class="d-none" (change)="onImageUpload($event)" #doctorImage
+              accept="image/jpeg,image/png,image/jpg,image/webp,image/jfif,image" />
+            <div class="invalid-feedback validphoto">يرجى رفع صورة صالحة</div>
+            <div class="position-absolute bottom-0 start-50 translate-middle-x" style="transform: translateY(50%);">
+              <div class="bg-white rounded-circle p-1 shadow-sm" style="width: 24px; height: 24px;">
+                <i class="fa-solid fa-arrow-up-from-bracket text-primary d-flex justify-content-center align-items-center"
+                  style="font-size: 14px;"></i>
+              </div>
+            </div>
+            <span *ngIf="doctor.doctorImageFile" class="text-success mt-4 d-block">تم رفع الصورة: {{
+              doctor.doctorImageFile.name }}</span>
+          </div>
+        </div>
+
+        <div class="col-md-6 rowright">
+          <div class="form-section">
+            <label for="validationCustom01" class="form-label">اسم المعالج</label>
+            <input type="text" id="validationCustom01" class="form-control" placeholder="اسم المعالج"
+              name="therapistName" [(ngModel)]="doctor.name" required #therapistName="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال اسم المعالج</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="email" class="form-label">البريد الإلكتروني</label>
+            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="doctor.email"
+              placeholder="أدخل الإيميل" required #email="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال بريد إلكتروني صالح</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="phone" class="form-label">رقم التليفون</label>
+            <input type="text" class="form-control" id="phone" name="phone" [(ngModel)]="doctor.phone"
+              placeholder="الرقم" required #phone="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال رقم هاتف صالح</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <!-- رفع الشهادات بشكل زر دائري -->
+          <div class="form-section certificate text-start d-flex justify-content-between align-items-center">
+            <label class="form-label">الشهادات</label>
+            <button type="button" class="d-inline-flex align-items-center justify-content-center upload-btn"
+              (click)="triggerCertInput()">
+              <i class="fa-solid fa-arrow-up-from-bracket" style="cursor: pointer;"></i>
+            </button>
+            <input type="file" id="certUpload" class="d-none" (change)="onCertUpload($event)" #certUpload
+              accept=".pdf,.doc,.docx,.jpg,.png,.webp,.jfif" />
+            <div class="invalid-feedback validcertificate">يرجى رفع شهادة صالحة</div>
+            <span *ngIf="certFileName" class="text-success ms-2">تم رفع الملف: {{ certFileName }}</span>
+          </div>
+          <div class="form-section">
+            <label for="specializationId" class="form-label">التخصص</label>
+            <select class="form-select" id="specializationId" name="specializationId"
+              [(ngModel)]="doctor.specializationId" required #specializationId="ngModel">
+              <option value="" disabled>اختر</option>
+              @for (specialization of specializations; track specialization.id) {
+              <option [value]="specialization.name">{{ specialization.name }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">يرجى اختيار التخصص</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-section">
+            <label for="nationalId" class="form-label">رقم الهوية</label>
+            <input type="text" class="form-control" id="nationalId" name="nationalId" [(ngModel)]="doctor.nationalId"
+              placeholder="الرقم" required pattern="[0-9]{14}" #nationalId="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال رقم هوية صالح (14 رقم)</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="password" class="form-label">كلمة السر</label>
+            <input type="password" class="form-control" id="password" name="password" [(ngModel)]="doctor.password"
+              placeholder="**********************" required minlength="6" #password="ngModel" />
+            <div class="invalid-feedback">يرجى إدخال كلمة السر (6 أحرف على الأقل)</div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section">
+            <label for="about" class="form-label">معلومات عن المعالج</label>
+            <textarea class="form-control" id="about" name="about" [(ngModel)]="doctor.about"
+              placeholder="أدخل المعلومات" rows="5" required></textarea>
+            <div class="invalid-feedback">يرجى إدخال معلومات عن المعالج صالحة </div>
+            <div class="valid-feedback">يبدو جيدًا!</div>
+          </div>
+          <div class="form-section row">
+            <div class="col-6">
+              <label for="gender" class="form-label">الجنس</label>
+              <select class="form-select" id="gender" name="gender" [(ngModel)]="doctor.gender" required
+                #gender="ngModel">
+                <option value="" disabled>اختر</option>
+                <option value="Male">ذكر</option>
+                <option value="Female">أنثى</option>
+              </select>
+              <div class="invalid-feedback">يرجى اختيار الجنس</div>
+              <div class="valid-feedback">يبدو جيدًا!</div>
+            </div>
+            <div class="col-6">
+              <label for="experienceYears" class="form-label">سنوات الخبرة</label>
+              <input type="number" class="form-control" id="experienceYears" name="experienceYears"
+                [(ngModel)]="doctor.experienceYears" placeholder="سنوات الخبرة" required min="0"
+                #experienceYears="ngModel" />
+              <div class="invalid-feedback">يرجى إدخال سنوات الخبرة (0 أو أكثر)</div>
+              <div class="valid-feedback">يبدو جيدًا!</div>
+            </div>
+          </div>
+          <div class="form-section row">
+            <div class="col-6">
+              <label for="doctorPercentage" class="form-label">نسبة الدكتور</label>
+              <input type="number" class="form-control" id="doctorPercentage" name="doctorPercentage"
+                [(ngModel)]="doctor.doctorPercentage" placeholder="نسبة الدكتور" required min="0" max="100"
+                #doctorPercentage="ngModel" />
+              <div class="invalid-feedback">يرجى إدخال نسبة بين 0 و100</div>
+              <div class="valid-feedback">يبدو جيدًا!</div>
+            </div>
+            <div class="col-6">
+              <label for="consultationFee" class="form-label">سعر الكشف</label>
+              <input type="number" class="form-control" id="consultationFee" name="consultationFee"
+                [(ngModel)]="doctor.consultationFee" placeholder="سعر الكشف" required min="0"
+                #consultationFee="ngModel" />
+              <div class="invalid-feedback">يرجى إدخال سعر الكشف (0 أو أكثر)</div>
+              <div class="valid-feedback">يبدو جيدًا!</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 text-center mt-4">
+          <button class="btn btn-save" type="submit">حفظ</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
