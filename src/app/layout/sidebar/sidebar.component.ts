@@ -12,10 +12,13 @@ import { CommonModule } from '@angular/common';
 })
 export class SidebarComponent implements OnInit, AfterViewInit {
   isSidebarOpen: boolean = window.innerWidth > 992;
-  
+
   menuItems: any[] = [];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.updateMenuItems();
@@ -108,6 +111,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       },
       { label: 'الإشعارات', path: '/notification', icons: 'fa-solid fa-bell' },
       { label: 'المرضي', path: '/patient', icons: 'fa-solid fa-user-injured' },
+      {
+        label: 'الاعلانات',
+        path: '/Advertisements',
+        icons: 'fa-solid fa-bullhorn',
+      },
       { label: 'تسجيل الخروج', path: null, icons: 'fa-solid fa-sign-out-alt' },
     ];
 

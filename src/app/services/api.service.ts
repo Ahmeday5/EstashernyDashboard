@@ -72,7 +72,7 @@ export class ApiService {
           status: error.status,
           message: errorMessage,
         }));
-      })
+      }),
     );
   }
 
@@ -91,7 +91,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب المبلغ الصافي:', error);
           return throwError(() => new Error('فشل جلب المبلغ الصافي'));
-        })
+        }),
       );
   }
 
@@ -107,7 +107,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب الأرباح اليوم:', error);
           return throwError(() => new Error('فشل جلب الأرباح اليوم'));
-        })
+        }),
       );
   }
 
@@ -125,7 +125,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب إجمالي المواعيد:', error);
           return throwError(() => new Error('فشل جلب إجمالي المواعيد'));
-        })
+        }),
       );
   }
 
@@ -143,7 +143,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب مواعيد اليوم:', error);
           return throwError(() => new Error('فشل جلب مواعيد اليوم'));
-        })
+        }),
       );
   }
 
@@ -161,7 +161,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب إجمالي المرضى:', error);
           return throwError(() => new Error('فشل جلب إجمالي المرضى'));
-        })
+        }),
       );
   }
 
@@ -179,7 +179,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب مرضى اليوم:', error);
           return throwError(() => new Error('فشل جلب مرضى اليوم'));
-        })
+        }),
       );
   }
 
@@ -197,7 +197,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب التخصصات:', error);
           return throwError(() => new Error('فشل جلب التخصصات'));
-        })
+        }),
       );
   }
 
@@ -214,7 +214,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب كل الدكاترة:', error);
           return throwError(() => new Error('فشل جلب كل الدكاترة'));
-        })
+        }),
       );
   }
 
@@ -245,9 +245,9 @@ export class ApiService {
         catchError((error) => {
           console.error(`خطأ في جلب الدكاترة بتاعين ${specialityName}:`, error);
           return throwError(
-            () => new Error(`فشل جلب دكاترة ${specialityName}`)
+            () => new Error(`فشل جلب دكاترة ${specialityName}`),
           );
-        })
+        }),
       );
   }
 
@@ -264,7 +264,7 @@ export class ApiService {
       catchError((error) => {
         console.error(`خطأ في البحث عن الاسم "${name}":`, error);
         return throwError(() => new Error(`فشل البحث عن الاسم "${name}"`));
-      })
+      }),
     );
   }
 
@@ -296,7 +296,7 @@ export class ApiService {
             errorMessage = error.error; // "Email is already registered"
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -313,7 +313,7 @@ export class ApiService {
         catchError((error) => {
           console.error(`خطأ في جلب الدكتور ذو الـ ID ${id}:`, error);
           return throwError(() => new Error(`فشل جلب الدكتور ذو الـ ID ${id}`));
-        })
+        }),
       );
   }
 
@@ -343,7 +343,7 @@ export class ApiService {
             errorMessage = `خطأ ${error.status}: ${error.statusText}`;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -376,7 +376,7 @@ export class ApiService {
             errorMessage = `خطأ ${error.status}: ${error.statusText}`;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -409,7 +409,7 @@ export class ApiService {
             errorMessage = `خطأ ${error.status}: ${error.statusText}`;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -445,7 +445,7 @@ export class ApiService {
             errorMessage = `خطأ ${error.status}: ${error.statusText}`;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -477,7 +477,7 @@ export class ApiService {
             errorMessage = error.error;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -520,7 +520,7 @@ export class ApiService {
             errorMessage = error.error;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -535,13 +535,13 @@ export class ApiService {
     return this.http
       .get<any>(
         `${this.baseUrl}/api/Dashboard/getAllDoctorsIDNameAndSpecialization`,
-        { headers }
+        { headers },
       )
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب الدكاترة والتخصصات:', error);
           return throwError(() => new Error('فشل جلب الدكاترة والتخصصات'));
-        })
+        }),
       );
   }
 
@@ -567,7 +567,7 @@ export class ApiService {
         {
           headers,
           responseType: 'text', // الاستجابة نص
-        }
+        },
       )
       .pipe(
         map((response: string) => {
@@ -576,7 +576,7 @@ export class ApiService {
             const parsedResponse = JSON.parse(response); // محاولة تحويل النص لـ JSON
             if (
               parsedResponse.message.includes(
-                'Discount applied and saved successfully'
+                'Discount applied and saved successfully',
               )
             ) {
               return {
@@ -606,7 +606,7 @@ export class ApiService {
             errorMessage = error.error;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -620,15 +620,15 @@ export class ApiService {
       headers = { Authorization: `Bearer ${token}` }; // نضيف التوكن لو موجود
     }
     return this.http
-      .get<{ doctorNames: string[]; message: string }>(
-        `${this.baseUrl}/api/Dashboard/getAllDoctorsNames`,
-        { headers }
-      )
+      .get<{
+        doctorNames: string[];
+        message: string;
+      }>(`${this.baseUrl}/api/Dashboard/getAllDoctorsNames`, { headers })
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب أسماء الدكاترة:', error); // لو فيه خطأ، نطبعو
           return throwError(() => new Error('فشل جلب أسماء الدكاترة')); // نرجع خطأ
-        })
+        }),
       );
   }
 
@@ -658,13 +658,13 @@ export class ApiService {
         {
           headers,
           params: httpParams, // نضيف الفلاتر هنا
-        }
+        },
       )
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب بيانات الأرباح:', error); // لو فيه خطأ، نطبعو
           return throwError(() => new Error('فشل جلب بيانات الأرباح')); // نرجع خطأ
-        })
+        }),
       );
   }
 
@@ -696,7 +696,7 @@ export class ApiService {
             errorMessage = error.error; // "Email is already registered"
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -714,7 +714,7 @@ export class ApiService {
         catchError((error) => {
           console.error('خطأ في جلب كل المستخدمين:', error);
           return throwError(() => new Error('فشل جلب كل المستخدمين'));
-        })
+        }),
       );
   }
 
@@ -742,7 +742,7 @@ export class ApiService {
             errorMessage = error.error;
           }
           return throwError(() => ({ success: false, message: errorMessage }));
-        })
+        }),
       );
   }
 
@@ -752,7 +752,7 @@ export class ApiService {
   searchPatientsByName(
     name: string = '',
     page: number = 1,
-    pageSize: number = 10
+    pageSize: number = 10,
   ): Observable<PatientResponse> {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
@@ -782,7 +782,107 @@ export class ApiService {
           errorMessage = error.error;
         }
         return throwError(() => ({ success: false, message: errorMessage }));
-      })
+      }),
     );
+  }
+
+  /***************************************************Advertisements************************************************************ */
+  addAdvertisements(data: { Title: string; ImageFile: File }): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '', // ⚠️ بدون Content-Type
+    });
+
+    const formData = new FormData();
+    formData.append('Title', data.Title);
+    formData.append('ImageFile', data.ImageFile); // ⚠️ الاسم لازم يطابق السيرفر
+
+    return this.http
+      .post(`${this.baseUrl}/api/Dashboard/addAdvertisement`, formData, {
+        headers,
+        responseType: 'text', // <--- هنا نقولله النص عادي
+      })
+      .pipe(
+        map((response: string) => ({
+          success: true,
+          message: response || 'تم الإرسال',
+        })),
+        catchError((error: HttpErrorResponse) => {
+          console.error('خطأ في إضافة الاعلان:', error);
+          let errorMessage = 'حدث خطأ أثناء الإرسال';
+          if (error.status === 0) errorMessage = 'مشكلة في الاتصال بالسيرفر';
+          else if (error.status === 401 || error.status === 403)
+            errorMessage = 'الجلسة انتهت، برجاء تسجيل الدخول مجدداً';
+          else if (error.status === 404) errorMessage = 'الطلب غير موجود';
+          else if (error.status >= 500)
+            errorMessage = 'مشكلة في السيرفر، حاول بعد شوية';
+          return throwError(() => ({ success: false, message: errorMessage }));
+        }),
+      );
+  }
+
+  getAllAdvertisements(
+    page: number = 1,
+    pageSize: number = 5,
+  ): Observable<any> {
+    const token = localStorage.getItem('token');
+    let headers = {};
+    if (token) {
+      headers = { Authorization: `Bearer ${token}` };
+    }
+
+    return this.http
+      .get<any>(
+        `${this.baseUrl}/api/Dashboard/getAllAdvertisements?page=${page}&pageSize=${pageSize}`,
+        { headers },
+      )
+      .pipe(
+        catchError((error) => {
+          console.error('خطأ في جلب الإعلانات:', error);
+          return throwError(() => new Error('فشل جلب الإعلانات'));
+        }),
+      );
+  }
+
+  deleteAdvertisements(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    return this.http
+      .delete(`${this.baseUrl}/api/Dashboard/deleteAdvertisement/${id}`, {
+        headers,
+        responseType: 'text', // السيرفر بيرجع نص
+      })
+      .pipe(
+        map((response: string) => {
+          let message = response;
+
+          // ✅ نحاول نفك JSON لو السيرفر رجع نص بشكل JSON
+          try {
+            const parsed = JSON.parse(response);
+            message = parsed.message || response;
+          } catch (e) {
+            // ignore - يعني الرد نص عادي مش JSON
+          }
+
+          const isSuccess =
+            message.toLowerCase().includes('deleted successfully') ||
+            message.toLowerCase().includes('specialty deleted successfully');
+
+          return {
+            success: isSuccess,
+            message,
+          };
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error(`⚠️ خطأ في حذف التخصص ذو الـ ID ${id}:`, error);
+          let errorMessage = 'حدث خطأ أثناء الحذف';
+          if (error.error && typeof error.error === 'string') {
+            errorMessage = error.error;
+          }
+          return throwError(() => ({ success: false, message: errorMessage }));
+        }),
+      );
   }
 }

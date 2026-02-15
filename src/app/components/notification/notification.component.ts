@@ -20,7 +20,7 @@ export class NotificationComponent {
   isLoading: boolean = false;
 
   constructor(private http: HttpClient) {}
-
+  
   async sendNotification() {
     this.successMessage = '';
     this.errorMessage = '';
