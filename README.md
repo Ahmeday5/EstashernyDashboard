@@ -1,27 +1,48 @@
 # EstashernyDashboard
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
+## Description
+EstashernyDashboard is an **Angular 18 admin dashboard** designed for the "Estasherny" medical application.  
+Through this dashboard, administrators can fully manage doctors, patients, and appointments, as well as monitor the platform's performance and analytics.
 
-## Development server
+### Key Features
+- **Doctor Management**
+  - Add, edit, or remove doctors
+  - Manage doctor specialties
+  - Apply discounts to doctor services
+  - Full CRUD functionality
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Patient Management**
+  - View all patients
+  - Add or edit patient details
 
-## Code scaffolding
+- **Appointments & Consultations**
+  - View and manage bookings
+  - Conduct online consultations
+  - Full communication management between doctors and patients
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Reports & Analytics**
+  - Daily and monthly revenue reports
+  - Statistics on appointments and consultations
 
-## Build
+- **Search & Filtering**
+  - Quick search for doctors or patients
+  - Filter by specialties, availability, or other criteria
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- **Notifications**
+  - Send push notifications via Firebase
+  - Target all doctors or specific patients
 
-## Running unit tests
+### Technologies Used
+- Angular 18
+- TypeScript
+- HTML / CSS / SCSS
+- RxJS
+- Firebase (for notifications)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Notes
+- This repository contains the **UI and code structure** for the dashboard.  
+- Any backend API calls (appointments, users, payments) are **connected to the live server** and are not included in this repository for security reasons.  
+- Safe to clone or review the code for learning or portfolio purposes.
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### How to Run
+1. Clone the repository:
