@@ -11,14 +11,14 @@
         </a>
       </div>
     </div>
-    
+
     <!-- قائمة التنقل -->
     <div>
       <ul class="nav-menu">
         @for (item of menuItems; track $index) {
         <li class="nav-item" [ngClass]="{'has-submenu': item.submenu, 'open': item.isOpen}">
           @if (isLogoutItem(item)) {
-          <a (click)="logout()" class="nav-link">
+          <a (click)="logout()" class="nav-link mt-5">
             <div style="cursor: pointer;" class="icon-text">
               <i class="fa-solid fa-sign-out-alt"></i>
               <span>{{ item.label }}</span>

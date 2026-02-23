@@ -18,13 +18,13 @@ interface UserData {
 })
 export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(
-    localStorage.getItem('isLoggedIn') === 'true'
+    !!localStorage.getItem('token'),
   );
 
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
   private roleSubject = new BehaviorSubject<string[] | null>(
-    this.getUserData()?.roles || null
+    this.getUserData()?.roles || null,
   );
   public role$ = this.roleSubject.asObservable();
 
@@ -35,10 +35,13 @@ export class AuthService {
   }
 
   private loadUserData(): void {
+    const token = localStorage.getItem('token');
     const userData = localStorage.getItem('userData');
-    if (userData) {
+
+    if (token && userData) {
       try {
         this.userData = JSON.parse(userData) as UserData;
+
         if (this.userData?.roles) {
           this.roleSubject.next(this.userData.roles);
           this.isLoggedInSubject.next(true);
@@ -47,6 +50,8 @@ export class AuthService {
         console.error('خطأ في تحليل userData:', error);
         this.logout();
       }
+    } else {
+      this.logout();
     }
   }
 
@@ -54,12 +59,15 @@ export class AuthService {
     if (!response.email || !response.roles || !response.token) {
       throw new Error('بيانات تسجيل الدخول غير صالحة');
     }
+
     this.userData = response;
-    this.isLoggedInSubject.next(true);
-    this.roleSubject.next(response.roles || []);
-    localStorage.setItem('isLoggedIn', 'true');
+
     localStorage.setItem('userData', JSON.stringify(response));
-    localStorage.setItem('token', response.token || '');
+    localStorage.setItem('token', response.token);
+
+    this.roleSubject.next(response.roles);
+    this.isLoggedInSubject.next(true);
+
     if (response.rememberMe) {
       localStorage.setItem('savedEmail', response.email);
     } else {
@@ -68,15 +76,12 @@ export class AuthService {
   }
 
   logout(): void {
-    if (this.isLoggedInSubject.value) {
-      this.isLoggedInSubject.next(false);
-      this.roleSubject.next(null);
-      this.userData = null;
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userData');
-      localStorage.removeItem('savedEmail');
-      localStorage.removeItem('token');
-    }
+    this.isLoggedInSubject.next(false);
+    this.roleSubject.next(null);
+    this.userData = null;
+    localStorage.removeItem('userData');
+    localStorage.removeItem('savedEmail');
+    localStorage.removeItem('token');
   }
 
   getUserData(): UserData | null {

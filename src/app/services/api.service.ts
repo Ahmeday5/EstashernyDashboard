@@ -80,13 +80,8 @@ export class ApiService {
 
   // الاند بوينتات الجديدة
   getTotalProfit(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getTotalProfit`, { headers })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getTotalProfit`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب المبلغ الصافي:', error);
@@ -96,13 +91,8 @@ export class ApiService {
   }
 
   getProfitToday(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getProfitToday`, { headers })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getProfitToday`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب الأرباح اليوم:', error);
@@ -112,15 +102,8 @@ export class ApiService {
   }
 
   getTotalAppointmentsCount(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getTotalAppointmentsCount`, {
-        headers,
-      })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getTotalAppointmentsCount`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب إجمالي المواعيد:', error);
@@ -130,15 +113,8 @@ export class ApiService {
   }
 
   getTodayAppointmentsCount(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getTodayAppointmentsCount`, {
-        headers,
-      })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getTodayAppointmentsCount`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب مواعيد اليوم:', error);
@@ -148,15 +124,8 @@ export class ApiService {
   }
 
   getTotalPatientsCount(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getTotalPatientsCount`, {
-        headers,
-      })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getTotalPatientsCount`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب إجمالي المرضى:', error);
@@ -166,15 +135,8 @@ export class ApiService {
   }
 
   getTodayPatientsCount(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getTodayPatientsCount`, {
-        headers,
-      })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getTodayPatientsCount`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب مرضى اليوم:', error);
@@ -186,13 +148,8 @@ export class ApiService {
   /***************************************************alldoctor************************************************************ */
 
   getAllSpecialities(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getAllSpecialities`, { headers })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getAllSpecialities`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب التخصصات:', error);
@@ -203,13 +160,8 @@ export class ApiService {
 
   // دالة جديدة لجلب كل الدكاترة
   getAllDoctors(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getAllDoctors`, { headers })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getAllDoctors`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب كل الدكاترة:', error);
@@ -220,14 +172,9 @@ export class ApiService {
 
   // دالة جديدة لجلب الدكاترة حسب التخصص
   getDoctorsBySpecialization(specialityName: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     const url = `${this.baseUrl}/api/Dashboard/getDoctorsBySpecialization?specialization=${specialityName}`; // نزود الاسم كما هو بدون encodeURIComponent
     return this.http
-      .get(url, { headers, responseType: 'text' }) // نغير responseType لـ text
+      .get(url, { responseType: 'text' }) // نغير responseType لـ text
       .pipe(
         map((response) => {
           try {
@@ -252,13 +199,8 @@ export class ApiService {
   }
 
   searchByDoctorName(name: string): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     const url = `${this.baseUrl}/api/Dashboard/searchByDoctorName?name=${name}`;
-    return this.http.get<any>(url, { headers }).pipe(
+    return this.http.get<any>(url).pipe(
       // رجعنا لـ JSON بدل text
       map((response) => (Array.isArray(response) ? response : [])), // معالجة الـ array مباشرة
       catchError((error) => {
@@ -271,14 +213,8 @@ export class ApiService {
   /***************************************************AddDoctor************************************************************ */
 
   addDoctor(formData: FormData): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .post(`${this.baseUrl}/api/Dashboard/addDoctor`, formData, {
-        headers,
         responseType: 'text',
       })
       .pipe(
@@ -303,12 +239,8 @@ export class ApiService {
   /***************************************************DoctorDetails************************************************************ */
 
   getDoctorById(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getDoctor/${id}`, { headers })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getDoctor/${id}`)
       .pipe(
         catchError((error) => {
           console.error(`خطأ في جلب الدكتور ذو الـ ID ${id}:`, error);
@@ -319,14 +251,8 @@ export class ApiService {
 
   // دالة جديدة لحذف الدكتور
   deleteDoctor(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .delete(`${this.baseUrl}/api/Dashboard/deleteDoctor/${id}`, {
-        headers,
         responseType: 'text', // تعامل مع الاستجابة كـ نص
       })
       .pipe(
@@ -349,14 +275,8 @@ export class ApiService {
 
   // دالة جديدة لتنشيط الدكتور
   activeDoctor(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .put(`${this.baseUrl}/api/Dashboard/activateDoctor/${id}`, null, {
-        headers,
         responseType: 'text',
       })
       .pipe(
@@ -382,14 +302,8 @@ export class ApiService {
 
   // دالة جديدة لحظر الدكتور
   inactiveDoctor(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .put(`${this.baseUrl}/api/Dashboard/deactivateDoctor/${id}`, null, {
-        headers,
         responseType: 'text',
       })
       .pipe(
@@ -416,14 +330,8 @@ export class ApiService {
   /***************************************************EditDoctor************************************************************ */
 
   updateDoctor(formData: FormData, id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .put(`${this.baseUrl}/api/Dashboard/updateDoctor/${id}`, formData, {
-        headers,
         responseType: 'text', // نص بسيط زي "Doctor updated successfully"
       })
       .pipe(
@@ -451,16 +359,10 @@ export class ApiService {
 
   /***************************************************Specialitie************************************************************ */
   addSpecialitie(data: { name: string; imageUrl: string }): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     console.log('Body sent:', data);
 
     return this.http
-      .post(`${this.baseUrl}/api/Dashboard/addSpecialty`, data, { headers })
+      .post(`${this.baseUrl}/api/Dashboard/addSpecialty`, data)
       .pipe(
         map((response: any) => {
           // ✅ الرد الحقيقي من السيرفر
@@ -482,14 +384,8 @@ export class ApiService {
   }
 
   deleteSpecialty(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .delete(`${this.baseUrl}/api/Dashboard/deleteSpecialty/${id}`, {
-        headers,
         responseType: 'text', // السيرفر بيرجع نص
       })
       .pipe(
@@ -527,15 +423,9 @@ export class ApiService {
   /***************************************************discount************************************************************ */
 
   getAllDoctorsIDNameAndSpecialization(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
       .get<any>(
         `${this.baseUrl}/api/Dashboard/getAllDoctorsIDNameAndSpecialization`,
-        { headers },
       )
       .pipe(
         catchError((error) => {
@@ -551,12 +441,6 @@ export class ApiService {
     date: string;
     discountPercentage: number;
   }): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json', // نوع البيانات JSON
-    });
-
     // طباعة البيانات المرسلة للتحقق
     console.log('بيانات إضافة الخصم:', params);
 
@@ -565,7 +449,6 @@ export class ApiService {
         `${this.baseUrl}/api/Dashboard/applyDiscountToAppointment`,
         params,
         {
-          headers,
           responseType: 'text', // الاستجابة نص
         },
       )
@@ -614,16 +497,11 @@ export class ApiService {
 
   // دالة جديدة لجلب أسماء الدكاترة
   getAllDoctorsNames(): Observable<{ doctorNames: string[]; message: string }> {
-    const token = localStorage.getItem('token'); // نجيب التوكن من التخزين المحلي
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` }; // نضيف التوكن لو موجود
-    }
     return this.http
       .get<{
         doctorNames: string[];
         message: string;
-      }>(`${this.baseUrl}/api/Dashboard/getAllDoctorsNames`, { headers })
+      }>(`${this.baseUrl}/api/Dashboard/getAllDoctorsNames`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب أسماء الدكاترة:', error); // لو فيه خطأ، نطبعو
@@ -636,12 +514,6 @@ export class ApiService {
   getDoctorsDailyAndMonthlyProfit(params: {
     [key: string]: string;
   }): Observable<{ message: string; profits: any[] }> {
-    const token = localStorage.getItem('token'); // نجيب التوكن من التخزين المحلي
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` }; // نضيف التوكن لو موجود
-    }
-
     // بنبني باراميترات الـ URL بناءً على الفلاتر (تاريخ، تخصص، اسم دكتور)
     let httpParams = new HttpParams();
     Object.keys(params).forEach((key) => {
@@ -656,7 +528,6 @@ export class ApiService {
       .get<{ message: string; profits: any[] }>(
         `${this.baseUrl}/api/Dashboard/getDoctorsDailyAndMonthlyProfit`,
         {
-          headers,
           params: httpParams, // نضيف الفلاتر هنا
         },
       )
@@ -671,14 +542,8 @@ export class ApiService {
   /***************************************************adduser************************************************************ */
 
   addUser(formData: FormData): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .post(`${this.baseUrl}/api/Dashboard/addEmployee`, formData, {
-        headers,
         responseType: 'text',
       })
       .pipe(
@@ -703,13 +568,8 @@ export class ApiService {
   /***************************************************alluser************************************************************ */
 
   getAllUser(): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
     return this.http
-      .get<any>(`${this.baseUrl}/api/Dashboard/getAllEmployees`, { headers })
+      .get<any>(`${this.baseUrl}/api/Dashboard/getAllEmployees`)
       .pipe(
         catchError((error) => {
           console.error('خطأ في جلب كل المستخدمين:', error);
@@ -719,14 +579,8 @@ export class ApiService {
   }
 
   deleteUser(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
-
     return this.http
       .delete(`${this.baseUrl}/api/Dashboard/deleteEmployee/${id}`, {
-        headers,
         responseType: 'text',
       })
       .pipe(
@@ -754,12 +608,6 @@ export class ApiService {
     page: number = 1,
     pageSize: number = 10,
   ): Observable<PatientResponse> {
-    const token = localStorage.getItem('token');
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-
     let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
@@ -768,7 +616,7 @@ export class ApiService {
     }
 
     const url = `${this.baseUrl}/api/Dashboard/searchPatientsByName`;
-    return this.http.get<PatientResponse>(url, { headers, params }).pipe(
+    return this.http.get<PatientResponse>(url, { params }).pipe(
       map((response) => ({
         total: response.total,
         page: response.page,
@@ -788,18 +636,12 @@ export class ApiService {
 
   /***************************************************Advertisements************************************************************ */
   addAdvertisements(data: { Title: string; ImageFile: File }): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '', // ⚠️ بدون Content-Type
-    });
-
     const formData = new FormData();
     formData.append('Title', data.Title);
     formData.append('ImageFile', data.ImageFile); // ⚠️ الاسم لازم يطابق السيرفر
 
     return this.http
       .post(`${this.baseUrl}/api/Dashboard/addAdvertisement`, formData, {
-        headers,
         responseType: 'text', // <--- هنا نقولله النص عادي
       })
       .pipe(
@@ -825,16 +667,9 @@ export class ApiService {
     page: number = 1,
     pageSize: number = 5,
   ): Observable<any> {
-    const token = localStorage.getItem('token');
-    let headers = {};
-    if (token) {
-      headers = { Authorization: `Bearer ${token}` };
-    }
-
     return this.http
       .get<any>(
         `${this.baseUrl}/api/Dashboard/getAllAdvertisements?page=${page}&pageSize=${pageSize}`,
-        { headers },
       )
       .pipe(
         catchError((error) => {
@@ -845,13 +680,8 @@ export class ApiService {
   }
 
   deleteAdvertisements(id: number): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
-    });
     return this.http
       .delete(`${this.baseUrl}/api/Dashboard/deleteAdvertisement/${id}`, {
-        headers,
         responseType: 'text', // السيرفر بيرجع نص
       })
       .pipe(
@@ -884,5 +714,33 @@ export class ApiService {
           return throwError(() => ({ success: false, message: errorMessage }));
         }),
       );
+  }
+
+  /***************************************************Privacy Policy********************************************************/
+
+  // جلب صفحة ثابتة
+  getStaticPage(pageType: number): Observable<string> {
+    const url = `${this.baseUrl}/api/Dashboard/getStaticPage?pageType=${pageType}`;
+    return this.http.get(url, { responseType: 'text' }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('خطأ في جلب الصفحة الثابتة:', error);
+        return throwError(() => new Error('فشل تحميل الصفحة'));
+      }),
+    );
+  }
+
+  // تحديث صفحة ثابتة
+  updateStaticPage(pageType: number, content: string): Observable<any> {
+    const url = `${this.baseUrl}/api/Dashboard/updateStaticPage`;
+    const body = { pageType, content };
+    return this.http.put(url, body, { responseType: 'text' }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('خطأ في تحديث الصفحة الثابتة:', error);
+        return throwError(() => ({
+          success: false,
+          message: 'فشل تحديث الصفحة',
+        }));
+      }),
+    );
   }
 }

@@ -1,0 +1,47 @@
+<div class="container mt-4">
+  <!-- اختيار الصفحة للعرض -->
+  <div class="mb-3">
+    <label for="pageSelect" class="form-label">اختر الصفحة للعرض:</label>
+    <select class="form-select w-auto" [(ngModel)]="selectedPageType" (change)="loadPrivacyPolicy(selectedPageType)">
+      <option [value]="1">خصوصية الدكاترة</option>
+      <option [value]="2">خصوصية المرضى</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <!-- عرض المحتوى -->
+  <div *ngIf="!loading" [innerHTML]="content"></div>
+
+  <!-- زر فتح مودال -->
+  <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editModal"
+    (click)="openModal(selectedPageType)">
+    تعديل المحتوى
+  </button>
+
+  <!-- Modal Bootstrap -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">تعديل الصفحة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <quill-editor [(ngModel)]="editorContent" [style]="{height: '300px'}"></quill-editor>
+        </div>
+        <div class="modal-footer">
+          <span class="text-success me-auto">{{successMessage}}</span>
+          <span class="text-danger me-auto">{{errorMessage}}</span>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="button" class="btn btn-primary" [disabled]="updating" (click)="saveContent()">
+            حفظ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -14,6 +14,7 @@ import { AddUserComponent } from './components/Users/add-user/add-user.component
 import { AllUserComponent } from './components/Users/all-user/all-user.component';
 import { PatientComponent } from './components/patient/patient.component';
 import { AdvertisementsComponent } from './components/advertisements/advertisements.component';
+import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 import { AuthService } from './services/auth.service';
 import { map, Observable } from 'rxjs';
 import { inject } from '@angular/core';
@@ -145,6 +146,12 @@ export const routes: Routes = [
     component: AdvertisementsComponent,
     canActivate: [canActivate, canActivateRole],
     data: { breadcrumb: 'الاعلانات', allowedRoles: ['Admin'] },
+  },
+  {
+    path: 'privacy-policy',
+    component: PrivacyPolicyComponent,
+    canActivate: [canActivate, canActivateRole],
+    data: { breadcrumb: 'سياسة الخصوصية', allowedRoles: ['Admin'] },
   },
   { path: '**', redirectTo: '' },
 ];

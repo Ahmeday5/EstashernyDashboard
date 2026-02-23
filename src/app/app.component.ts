@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { NgwWowService } from 'ngx-wow';
 import { HeaderComponent } from './layout/header/header.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -25,20 +25,20 @@ export class AppComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private ngwWowService: NgwWowService
+    private ngwWowService: NgwWowService,
   ) {
     this.isLoggedIn$ = this.authService.isLoggedIn$;
-    this.checkAuth();
     this.wowService = this.ngwWowService;
     this.wowService.init();
   }
 
-  checkAuth(): void {
-    this.isLoggedIn$.pipe(take(1)).subscribe((isLoggedIn) => {
-      if (!isLoggedIn) {
-        this.authService.logout();
-        this.router.navigate(['/login']);
-      }
-    });
+  ngOnInit() {
+    this.authService.isLoggedIn$
+      .pipe(takeUntilDestroyed())
+      .subscribe((isLoggedIn) => {
+        if (!isLoggedIn) {
+          this.router.navigate(['/login']);
+        }
+      });
   }
 }

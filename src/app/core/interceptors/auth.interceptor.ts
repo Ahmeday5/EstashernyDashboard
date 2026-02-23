@@ -1,21 +1,35 @@
-import { HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
-export const authInterceptor = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
-  console.log('Interceptor يشتغل، URL:', req.url); // دايمًا بيطبع عشان نتاكد
-  const token = localStorage.getItem('token'); // جلب التوكن مباشرة من localStorage
-  let authReq = req;
+let isHandling401 = false;
 
-  if (token) {
-    console.log('توكن مضاف:', token); // طباعة التوكن
-    authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token.trim()}`, // إضافة التوكن مع إزالة المسافات
-      },
-    });
-  } else {
-    console.log('لا توكن موجود في localStorage');
-  }
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-  return next(authReq); // تمرير الطلب
+  const token = authService.getToken();
+
+  const authReq = token
+    ? req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    : req;
+
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401 && !isHandling401) {
+        isHandling401 = true;
+        authService.logout();
+        router.navigate(['/login']);
+      }
+
+      return throwError(() => error);
+    }),
+  );
 };

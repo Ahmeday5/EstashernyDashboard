@@ -116,6 +116,11 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         path: '/Advertisements',
         icons: 'fa-solid fa-bullhorn',
       },
+      {
+        label: 'سياسة الخصوصية',
+        path: '/privacy-policy',
+        icons: 'fa-solid fa-file-contract',
+      },
       { label: 'تسجيل الخروج', path: null, icons: 'fa-solid fa-sign-out-alt' },
     ];
 
