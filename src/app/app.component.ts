@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { Observable } from 'rxjs';
@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { NgwWowService } from 'ngx-wow';
 import { HeaderComponent } from './layout/header/header.component';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +33,7 @@ export class AppComponent {
 
   ngOnInit() {
     this.authService.isLoggedIn$
-      .pipe(takeUntilDestroyed())
+      .pipe() // هنا نمرر DestroyRef
       .subscribe((isLoggedIn) => {
         if (!isLoggedIn) {
           this.router.navigate(['/login']);

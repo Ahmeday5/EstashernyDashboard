@@ -1,8 +1,8 @@
-<div class="container mt-4">
+<div class="container-fluid p-3">
   <!-- اختيار الصفحة للعرض -->
   <div class="mb-3">
     <label for="pageSelect" class="form-label">اختر الصفحة للعرض:</label>
-    <select class="form-select w-auto" [(ngModel)]="selectedPageType" (change)="loadPrivacyPolicy(selectedPageType)">
+    <select class="form-select w-auto" [ngModel]="selectedPageType" (ngModelChange)="selectedPageTypeChanged($event)">
       <option [value]="1">خصوصية الدكاترة</option>
       <option [value]="2">خصوصية المرضى</option>
     </select>
@@ -13,34 +13,51 @@
     <div class="spinner-border text-primary" role="status"></div>
   </div>
 
-  <!-- عرض المحتوى -->
-  <div *ngIf="!loading" [innerHTML]="content"></div>
-
-  <!-- زر فتح مودال -->
-  <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editModal"
-    (click)="openModal(selectedPageType)">
-    تعديل المحتوى
-  </button>
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- عرض المحتوى -->
+      <div *ngIf="!loading" [innerHTML]="content"></div>
+    </div>
+    <div class="col-lg-4">
+      <!-- زر فتح مودال -->
+      <button class="btn btn-primary mt-3 fw-bold" data-bs-toggle="modal" data-bs-target="#editModal"
+        (click)="openModal(selectedPageType)">
+        تعديل المحتوى
+      </button>
+    </div>
+  </div>
 
   <!-- Modal Bootstrap -->
+
   <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
+      <div class="modal-content" *ngIf="editorContent !== null">
         <div class="modal-header">
           <h5 class="modal-title">تعديل الصفحة</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <quill-editor [(ngModel)]="editorContent" [style]="{height: '300px'}"></quill-editor>
+          <div *ngIf="editorContent !== null && editorContent !== undefined; else loadingEditor">
+            <ckeditor [editor]="Editor" [(ngModel)]="editorContent" [config]="{height: '600px'}">
+            </ckeditor>
+          </div>
+          <ng-template #loadingEditor>
+            <div class="d-flex justify-content-center my-4">
+              <div class="spinner-border text-primary" role="status"></div>
+            </div>
+          </ng-template>
         </div>
         <div class="modal-footer">
           <span class="text-success me-auto">{{successMessage}}</span>
           <span class="text-danger me-auto">{{errorMessage}}</span>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-          <button type="button" class="btn btn-primary" [disabled]="updating" (click)="saveContent()">
+          <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">إلغاء</button>
+          <button type="button" class="btn btn-primary fw-bold" [disabled]="updating" (click)="saveContent()">
             حفظ
           </button>
         </div>
+      </div>
+      <div *ngIf="editorContent === null" class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status"></div>
       </div>
     </div>
   </div>

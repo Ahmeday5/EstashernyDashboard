@@ -1,0 +1,22 @@
+.form-select {
+  background: rgba(217, 217, 217, 1);
+  border: 1px solid rgba(217, 217, 217, 1);
+  padding: 12px 10px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+
+.form-select:focus {
+  border-color: rgba(217, 217, 217, 1);
+  box-shadow: none;
+  outline: none;
+}
+
+.form-select::placeholder {
+  color: var(--second-color);
+  font-family: var(--font-arabic) !important;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 100%;
+}
