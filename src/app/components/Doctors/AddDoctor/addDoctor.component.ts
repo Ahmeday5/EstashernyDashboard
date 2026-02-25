@@ -52,7 +52,7 @@ export class addDoctorComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -62,7 +62,7 @@ export class addDoctorComponent implements OnInit {
   async fetchSpecializations(): Promise<void> {
     try {
       const response = await firstValueFrom(
-        this.apiService.getAllSpecialities()
+        this.apiService.getAllSpecialities(),
       );
       this.specializations = response || [];
     } catch (error) {
@@ -81,17 +81,38 @@ export class addDoctorComponent implements OnInit {
   }
 
   onImageUpload(event: Event): void {
-    console.log('Image upload triggered', event);
     const input = event.target as HTMLInputElement;
+
     if (input.files && input.files.length > 0) {
-      console.log('Selected file:', input.files[0].name);
-      this.doctor.doctorImageFile = input.files[0];
-      this.doctorImagePreview = URL.createObjectURL(
-        this.doctor.doctorImageFile
-      ); // تحديث الصورة المؤقتة
-      // لا تعين doctor.doctorImage هنا إلا لو كنت عايز تعرض الملف مؤقتًا
-      input.value = '';
-      this.cdr.detectChanges();
+      const file = input.files[0];
+
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+
+        const ratio = width / height;
+        const targetRatio = 4 / 3;
+
+        if (Math.abs(ratio - targetRatio) > 0.01) {
+          this.errorMessage = 'يجب أن تكون الصورة بنسبة 4:3';
+          this.doctor.doctorImageFile = null;
+          this.doctorImagePreview = '/assets/img/doctors/upload.png';
+          input.value = '';
+          this.cdr.detectChanges();
+          return;
+        }
+
+        // لو تمام
+        this.errorMessage = '';
+        this.doctor.doctorImageFile = file;
+        this.doctorImagePreview = objectUrl;
+        this.cdr.detectChanges();
+      };
+
+      img.src = objectUrl;
     }
   }
 
@@ -123,7 +144,7 @@ export class addDoctorComponent implements OnInit {
       return;
     }
 
-    if ( !this.doctor.certificateFile) {
+    if (!this.doctor.certificateFile) {
       this.errorMessage = 'يرجى رفع شهادة الدكتور ';
       this.cdr.detectChanges();
       return;
@@ -149,7 +170,7 @@ export class addDoctorComponent implements OnInit {
 
     try {
       const response = await firstValueFrom(
-        this.apiService.addDoctor(formData)
+        this.apiService.addDoctor(formData),
       );
 
       if (response.success) {

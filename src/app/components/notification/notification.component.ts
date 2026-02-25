@@ -15,15 +15,31 @@ export class NotificationComponent {
   title: string = '';
   body: string = '';
   topic: string = 'patient'; // الافتراضي
+  imageUrl: string = '';
   successMessage: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
 
   constructor(private http: HttpClient) {}
-  
+
+  isValidImageUrl(url: string): boolean {
+    if (!url) return true; // فاضي يبقى تمام
+    // يتأكد من https وامتداد الصورة قبل أي ? أو نهاية الرابط
+    const pattern = /^https:\/\/.*\.(jpg|jpeg|png)(\?.*)?$/i;
+    return pattern.test(url);
+  }
+
   async sendNotification() {
     this.successMessage = '';
     this.errorMessage = '';
+
+    // تحقق من رابط الصورة
+    if (!this.isValidImageUrl(this.imageUrl)) {
+      this.errorMessage =
+        'رابط الصورة غير صالح. يجب أن يبدأ بـ https وينتهي بـ jpg أو jpeg أو png';
+      return;
+    }
+
     this.isLoading = true;
 
     try {
@@ -34,8 +50,9 @@ export class NotificationComponent {
             title: this.title,
             body: this.body,
             topic: this.topic,
-          }
-        )
+            imageUrl: this.imageUrl,
+          },
+        ),
       );
       console.log('Notification sent:', response);
       this.successMessage = 'تم إرسال الإشعار بنجاح';
@@ -45,11 +62,12 @@ export class NotificationComponent {
         this.title = '';
         this.body = '';
         this.topic = 'patient';
+        this.imageUrl = '';
       }, 2000);
     } catch (error: any) {
       console.error('Error sending notification:', error);
       this.errorMessage = 'فشل في إرسال الإشعار';
-    }finally {
+    } finally {
       this.isLoading = false;
     }
   }

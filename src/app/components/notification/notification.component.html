@@ -3,7 +3,7 @@
     <div class="col-md-12 page-name">
       <h1 class="page-title">إضافة تنبيه</h1>
     </div>
-    
+
     <!-- الرسائل -->
     <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
     <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
@@ -24,6 +24,12 @@
           <div class="form-group mt-3">
             <label for="title">عنوان الإشعار</label>
             <input id="title" class="form-control" [(ngModel)]="title" name="title" required />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mt-3">
+            <label for="imageUrl">لينك صورة الإشعار (اختياري)</label>
+            <input id="imageUrl" class="form-control" [(ngModel)]="imageUrl" name="imageUrl" />
           </div>
         </div>
         <div class="col-md-10">

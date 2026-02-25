@@ -38,8 +38,33 @@ export class AdvertisementsComponent implements OnInit {
 
   handleFileInput(event: Event) {
     const target = event.target as HTMLInputElement;
+
     if (target.files && target.files.length > 0) {
-      this.Advertisement.ImageFile = target.files[0]; // ⚠️ فقط هنا
+      const file = target.files[0];
+
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+
+        const ratio = width / height;
+
+        const targetRatio = 16 / 9;
+
+        if (Math.abs(ratio - targetRatio) > 0.02) {
+          this.errorMessage = 'يجب أن تكون صورة الإعلان بنسبة 16:9';
+          this.Advertisement.ImageFile = null;
+          target.value = '';
+          return;
+        }
+
+        this.errorMessage = '';
+        this.Advertisement.ImageFile = file;
+      };
+
+      img.src = objectUrl;
     }
   }
 
@@ -70,6 +95,7 @@ export class AdvertisementsComponent implements OnInit {
       this.form.resetForm();
       this.Advertisement.Title = '';
       this.Advertisement.ImageFile = null;
+      this.fetchAdvertisements();
       formElement.classList.remove('was-validated');
 
       setTimeout(() => {
