@@ -30,13 +30,14 @@
                 <h6>{{ doctor.specialization }}</h6>
                 <div class="btns">
                   <button class="btn btn-edit" (click)="onEdit()">تعديل</button>
+                  @if (this.isAdmin) {
                   <button class="btn btn-delete" (click)="onDelete()">حذف</button>
                   @if (doctor.isActive == false) {
                   <button class="btn btn-delete" (click)="activeDoc()">تنشيط</button>
                   }@else {
-                    <button class="btn btn-delete" (click)="inactiveDoc()">حظر</button>
-                   }
-
+                  <button class="btn btn-delete" (click)="inactiveDoc()">حظر</button>
+                  }
+                  }
                 </div>
               </div>
             </div>

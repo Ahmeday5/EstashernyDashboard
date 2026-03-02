@@ -68,13 +68,20 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
   // قائمة العناصر في الـ Sidebar
   // تحديث القائمة بناءً على الدور
+  // تحديث القائمة بناءً على الدور بطريقة احترافية
   private updateMenuItems(): void {
     const baseMenuItems = [
-      { label: 'الرئيسية', path: '/dashboard', icons: 'fa-solid fa-house' },
+      {
+        label: 'الرئيسية',
+        path: '/dashboard',
+        icons: 'fa-solid fa-house',
+        allowedRoles: ['Admin'], // متاح للجميع
+      },
       {
         label: 'دكتور',
         path: null,
         icons: 'fa-solid fa-user-md',
+        allowedRoles: ['Admin', 'Editor', 'Sales'], // Sales يحتاجها
         submenu: [
           {
             key: 'جميع الأطباء',
@@ -93,6 +100,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         path: null,
         icons: 'fa-solid fa-users',
         isOpen: false,
+        allowedRoles: ['Admin'], // غير متاح لـ Sales أو Marketing
         submenu: [
           { key: 'المستخدمين', path: '/alluser', icon: 'fa-solid fa-users' },
           {
@@ -102,37 +110,64 @@ export class SidebarComponent implements OnInit, AfterViewInit {
           },
         ],
       },
-      { label: 'التقارير', path: '/reports', icons: 'fa-solid fa-chart-bar' },
-      { label: 'إضافة خصم', path: '/discount', icons: 'fa-solid fa-percent' },
+      {
+        label: 'التقارير',
+        path: '/reports',
+        icons: 'fa-solid fa-chart-bar',
+        allowedRoles: ['Admin'],
+      },
+      {
+        label: 'إضافة خصم',
+        path: '/discount',
+        icons: 'fa-solid fa-percent',
+        allowedRoles: ['Admin', 'Sales'], // Sales يحتاجها
+      },
       {
         label: 'التخصصات',
         path: '/Specialities',
         icons: 'fa-solid fa-stethoscope',
+        allowedRoles: ['Admin', 'Editor'],
       },
-      { label: 'الإشعارات', path: '/notification', icons: 'fa-solid fa-bell' },
-      { label: 'المرضي', path: '/patient', icons: 'fa-solid fa-user-injured' },
+      {
+        label: 'الإشعارات',
+        path: '/notification',
+        icons: 'fa-solid fa-bell',
+        allowedRoles: ['Admin', 'Editor', 'Marketing'], // Marketing يحتاجها
+      },
+      {
+        label: 'المرضي',
+        path: '/patient',
+        icons: 'fa-solid fa-user-injured',
+        allowedRoles: ['Admin', 'Editor'],
+      },
       {
         label: 'الاعلانات',
         path: '/Advertisements',
         icons: 'fa-solid fa-bullhorn',
+        allowedRoles: ['Admin', 'Editor', 'Marketing'], // Marketing يحتاجها
       },
       {
         label: 'سياسة الخصوصية',
         path: '/privacy-policy',
         icons: 'fa-solid fa-file-contract',
+        allowedRoles: ['Admin', 'Editor'],
       },
-      { label: 'تسجيل الخروج', path: null, icons: 'fa-solid fa-sign-out-alt' },
+      {
+        label: 'تسجيل الخروج',
+        path: null,
+        icons: 'fa-solid fa-sign-out-alt',
+        allowedRoles: ['Admin', 'Editor', 'Sales', 'Marketing'], // متاح للجميع
+      },
     ];
 
     const role = this.authService.getCurrentRole();
-    if (role && role.includes('Admin')) {
-      this.menuItems = [...baseMenuItems]; // Admin يشوف الكل
-    } else if (role && role.includes('Editor')) {
-      this.menuItems = baseMenuItems.filter((item) => {
-        return !['المستخدمين', 'التقارير', 'إضافة خصم'].includes(item.label);
-      });
+    if (role) {
+      // تصفية العناصر بناءً على allowedRoles
+      this.menuItems = baseMenuItems.filter((item) =>
+        item.allowedRoles.includes(role),
+      );
     } else {
-      this.menuItems = []; // لو مفيش دور، يظهرش حاجة
+      this.menuItems = []; // لا صلاحيات إذا لم يكن هناك دور
     }
   }
 }

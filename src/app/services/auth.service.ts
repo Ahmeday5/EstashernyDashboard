@@ -95,10 +95,10 @@ export class AuthService {
   }
 
   // جلب الدور الحالي
-  getCurrentRole(): string[] | null {
-    const role = this.roleSubject.value;
-    console.log('الدور الحالي:', role);
-    return role;
+  getCurrentRole(): string | null {
+    const roles = this.roleSubject.value;
+    console.log('الأدوار الحالية:', roles);
+    return roles?.[0] ?? null; // أول دور فقط
   }
 
   getSavedEmail(): string | null {

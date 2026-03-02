@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private apiService: ApiService
+    private apiService: ApiService,
   ) {}
 
   ngOnInit(): void {
@@ -77,11 +77,24 @@ export class LoginComponent implements OnInit {
         };
 
         const response = (await firstValueFrom(
-          this.apiService.login(credentials)
+          this.apiService.login(credentials),
         )) as LoginResponse;
         this.authService.login(response);
         this.errorMessage = null;
-        await this.router.navigate(['/dashboard']);
+
+        const roles = response.roles || [];
+        if (roles.includes('Admin')) {
+          await this.router.navigate(['/dashboard']);
+        } else if (roles.includes('Editor')) {
+          await this.router.navigate(['/alldoctor']); // أو صفحة أخرى إذا غيرت رأيك
+        } else if (roles.includes('Sales')) {
+          await this.router.navigate(['/alldoctor']); // أو '/discount'
+        } else if (roles.includes('Marketing')) {
+          await this.router.navigate(['/Advertisements']); // أو '/notification'
+        } else {
+          // في حالة غريبة (مفيش دور معروف)
+          await this.router.navigate(['/access-denied']);
+        }
       } catch (error: any) {
         this.errorMessage = error.message || 'حدث خطأ غير معروف.';
       } finally {

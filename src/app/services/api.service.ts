@@ -665,7 +665,7 @@ export class ApiService {
 
   getAllAdvertisements(
     page: number = 1,
-    pageSize: number = 5,
+    pageSize: number = 10,
   ): Observable<any> {
     return this.http
       .get<any>(

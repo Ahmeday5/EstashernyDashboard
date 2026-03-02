@@ -15,6 +15,7 @@ import { AllUserComponent } from './components/Users/all-user/all-user.component
 import { PatientComponent } from './components/patient/patient.component';
 import { AdvertisementsComponent } from './components/advertisements/advertisements.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
+import { AccessDeniedComponent } from './components/access-denied/access-denied.component';
 import { AuthService } from './services/auth.service';
 import { map, Observable } from 'rxjs';
 import { inject } from '@angular/core';
@@ -30,7 +31,7 @@ export const canActivate: CanActivateFn = (route, state) => {
         return router.createUrlTree(['/login']);
       }
       return true;
-    })
+    }),
   );
 };
 
@@ -40,12 +41,17 @@ export const canActivateRole: CanActivateFn = (route, state) => {
   const allowedRoles = (route.data['allowedRoles'] as string[]) || [];
 
   return authService.role$.pipe(
-    map((role) => {
-      if (!role || !allowedRoles.some((r) => role.includes(r))) {
-        return router.createUrlTree(['/dashboard']);
+    map((roles) => {
+      // إذا الدور موجود ومسموح → ادخل
+      if (roles && allowedRoles.some((r) => roles.includes(r))) {
+        return true;
       }
-      return true;
-    })
+
+      // ممنوع → وجه لـ access-denied مع معرفة منين جاء
+      return router.createUrlTree(['/access-denied'], {
+        queryParams: { from: state.url },
+      });
+    }),
   );
 };
 
@@ -57,13 +63,32 @@ export const routes: Routes = [
       () => {
         const authService = inject(AuthService);
         const router = inject(Router);
+
         return authService.isLoggedIn$.pipe(
           map((isLoggedIn) => {
-            if (isLoggedIn) {
-              return router.createUrlTree(['/dashboard']);
+            if (!isLoggedIn) {
+              return true;
             }
-            return true;
-          })
+
+            // ↓↓↓ هنا الحل الأساسي ↓↓↓
+            const roles = authService.getCurrentRole() as string[] | null;
+            const userRoles: string[] = roles ?? []; // تأكيد أنها مصفوفة دائماً
+
+            let targetPath = '/access-denied';
+
+            if (userRoles.includes('Admin')) {
+              targetPath = '/dashboard';
+            } else if (
+              userRoles.includes('Sales') ||
+              userRoles.includes('Editor')
+            ) {
+              targetPath = '/alldoctor';
+            } else if (userRoles.includes('Marketing')) {
+              targetPath = '/Advertisements';
+            }
+
+            return router.createUrlTree([targetPath]);
+          }),
         );
       },
     ],
@@ -73,49 +98,64 @@ export const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [canActivate],
-    data: { breadcrumb: 'الرئيسية' },
+    data: { breadcrumb: 'اللوحة الرئيسية', allowedRoles: ['Admin'] },
   },
   {
     path: 'adddoctor',
     component: addDoctorComponent,
-    canActivate: [canActivate],
-    data: { breadcrumb: 'الطلبيات' },
+    canActivate: [canActivate, canActivateRole],
+    data: {
+      breadcrumb: 'اضافة دكتور',
+      allowedRoles: ['Admin', 'Editor', 'Sales'],
+    },
   },
   {
     path: 'alldoctor',
     component: AlldoctorComponent,
-    canActivate: [canActivate],
-    data: { breadcrumb: 'الطلبيات' },
+    canActivate: [canActivate, canActivateRole],
+    data: {
+      breadcrumb: 'جميع الدكاترة',
+      allowedRoles: ['Admin', 'Editor', 'Sales'],
+    },
   },
   {
     path: 'doctor-details/:id',
     component: DoctorDetailsComponent,
-    canActivate: [canActivate],
-    data: { breadcrumb: 'المرتجعات' },
+    canActivate: [canActivate, canActivateRole],
+    data: {
+      breadcrumb: 'تفاصيل الدكتور',
+      allowedRoles: ['Admin', 'Editor', 'Sales'],
+    },
   },
   {
     path: 'edit-doctor/:id', // مسار جديد للتعديل
     component: EditDoctorComponent,
-    canActivate: [canActivate],
-    data: { breadcrumb: 'تعديل الدكتور' },
+    canActivate: [canActivate, canActivateRole],
+    data: {
+      breadcrumb: 'تعديل الدكتور',
+      allowedRoles: ['Admin', 'Editor', 'Sales'],
+    },
   },
   {
     path: 'Specialities',
     component: SpecialitiesComponent,
-    canActivate: [canActivate],
-    data: { breadcrumb: 'التخصصات' },
+    canActivate: [canActivate, canActivateRole],
+    data: { breadcrumb: 'التخصصات', allowedRoles: ['Admin', 'Editor'] },
   },
   {
     path: 'discount',
     component: DiscountComponent,
     canActivate: [canActivate, canActivateRole],
-    data: { breadcrumb: 'خصم', allowedRoles: ['Admin'] },
+    data: { breadcrumb: 'خصم', allowedRoles: ['Admin', 'Sales'] },
   },
   {
     path: 'notification',
     component: NotificationComponent,
-    canActivate: [canActivate],
-    data: { breadcrumb: 'اشعار' },
+    canActivate: [canActivate, canActivateRole],
+    data: {
+      breadcrumb: 'اشعار',
+      allowedRoles: ['Admin', 'Editor', 'Marketing'],
+    },
   },
   {
     path: 'reports',
@@ -139,19 +179,27 @@ export const routes: Routes = [
     path: 'patient',
     component: PatientComponent,
     canActivate: [canActivate, canActivateRole],
-    data: { breadcrumb: 'المرضي', allowedRoles: ['Admin'] },
+    data: { breadcrumb: 'المرضي', allowedRoles: ['Admin', 'Editor'] },
   },
   {
     path: 'Advertisements',
     component: AdvertisementsComponent,
     canActivate: [canActivate, canActivateRole],
-    data: { breadcrumb: 'الاعلانات', allowedRoles: ['Admin'] },
+    data: {
+      breadcrumb: 'الاعلانات',
+      allowedRoles: ['Admin', 'Editor', 'Marketing'],
+    },
   },
   {
     path: 'privacy-policy',
     component: PrivacyPolicyComponent,
     canActivate: [canActivate, canActivateRole],
-    data: { breadcrumb: 'سياسة الخصوصية', allowedRoles: ['Admin'] },
+    data: { breadcrumb: 'سياسة الخصوصية', allowedRoles: ['Admin', 'Editor'] },
+  },
+  {
+    path: 'access-denied',
+    component: AccessDeniedComponent,
+    canActivate: [canActivate], // لازم يكون مسجل دخول
   },
   { path: '**', redirectTo: '' },
 ];

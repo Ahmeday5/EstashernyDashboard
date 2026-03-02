@@ -40,12 +40,11 @@
           <!-- رفع صورة المستخدم -->
           <div class="text-center mb-4 position-relative">
             <button type="button" class="rounded-circle d-inline-block upload-image" (click)="triggerFileInput()">
-              <img class="rounded-circle d-inline-block"
-                [src]="doctorImagePreview" alt="رفع الصورة"
+              <img class="rounded-circle d-inline-block" [src]="doctorImagePreview" alt="رفع الصورة"
                 style="cursor: pointer; width: 100px;" />
             </button>
             <input type="file" id="doctorImage" class="d-none" (change)="onImageUpload($event)" #userImage
-              accept="image/jpeg,image/png,image/jpg,image/webp,image/jfif,image"  />
+              accept="image/jpeg,image/png,image/jpg,image/webp,image/jfif,image" />
             <div class="invalid-feedback validphoto">يرجى رفع صورة صالحة</div>
             <div class="position-absolute bottom-0 start-50 translate-middle-x" style="transform: translateY(50%);">
               <div class="bg-white rounded-circle p-1 shadow-sm" style="width: 24px; height: 24px;">
@@ -86,6 +85,8 @@
               <option value="" disabled>اختر</option>
               <option value="Admin">Admin</option>
               <option value="Editor">Editor</option>
+              <option value="sales">sales</option>
+              <option value="marketing">marketing</option>
             </select>
             <div class="invalid-feedback">يرجى إدخال وظيفة صالحة</div>
             <div class="valid-feedback">يبدو جيدًا!</div>

@@ -37,7 +37,7 @@ export class DoctorDetailsComponent {
     const role = this.authService.getCurrentRole();
     this.isAdmin = role ? role.includes('Admin') : false;
   }
-
+  
   loadDoctorDetails() {
     const id = this.route.snapshot.paramMap.get('id'); // استخراج الـ id من الـ URL
     if (id) {
