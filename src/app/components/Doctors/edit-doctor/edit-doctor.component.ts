@@ -3,14 +3,22 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
+
+// 🔥 الإضافات الجديدة للـ cropper
+import {
+  ImageCropperComponent,
+  ImageCroppedEvent,
+  LoadedImage,
+} from 'ngx-image-cropper';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-edit-doctor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageCropperComponent],
   templateUrl: './edit-doctor.component.html',
   styleUrl: './edit-doctor.component.scss',
 })
@@ -47,12 +55,21 @@ export class EditDoctorComponent {
   specializations: { id: number; name: string }[] = [];
   errorMessage: string = '';
   successMessage: string = '';
+  certFileName: string | null = null; // متغير لعرض اسم الملف المرفوع
+
+  // 🔥 متغيرات الـ Cropper الجديدة
+  imageChangedEvent: Event | null = null;
+  croppedImage: SafeUrl = '';
+  tempCroppedBlob: Blob | null = null;
+  showCropModal: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
-    private apiService: ApiService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private http: HttpClient,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer, // 🔥 ضروري للـ preview الآمن
   ) {}
 
   ngOnInit(): void {
@@ -108,7 +125,7 @@ export class EditDoctorComponent {
 
     // التحقق من إن اللينك فيه صيغة صالحة
     const isValidExtension = validImageExtensions.some((ext) =>
-      imageUrl.toLowerCase().endsWith(ext)
+      imageUrl.toLowerCase().endsWith(ext),
     );
     return isValidExtension ? imageUrl : defaultImage;
   }
@@ -116,7 +133,7 @@ export class EditDoctorComponent {
   async fetchSpecializations(): Promise<void> {
     try {
       const response = await firstValueFrom(
-        this.apiService.getAllSpecialities()
+        this.apiService.getAllSpecialities(),
       );
       this.specializations = response || [];
     } catch (error) {
@@ -134,28 +151,68 @@ export class EditDoctorComponent {
     this.certUpload.nativeElement.click();
   }
 
+  // 🔥 الدالة الجديدة (بدل التحقق القديم من النسبة)
   onImageUpload(event: Event): void {
-    console.log('Image upload triggered', event);
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      console.log('Selected file:', input.files[0].name);
-      this.doctor.doctorImageFile = input.files[0];
-      // لا تعين doctor.doctorImage هنا إلا لو كنت عايز تعرض الملف مؤقتًا
-      input.value = '';
+      this.imageChangedEvent = event; // 🔥 نبعت الحدث للـ cropper
+      this.showCropModal = true; // 🔥 نفتح المودال فوراً
+      this.doctor.doctorImageFile = null; // لسه ما اتقصش
       this.cdr.detectChanges();
     }
   }
 
   onCertUpload(event: Event): void {
-    console.log('Certificate upload triggered', event);
-    event.preventDefault();
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      console.log('Selected file:', input.files[0].name);
       this.doctor.certificateFile = input.files[0];
+      this.certFileName = input.files[0].name;
       input.value = '';
       this.cdr.detectChanges();
     }
+  }
+
+  // 🔥 الدوال الجديدة للـ Cropper
+  imageCropped(event: ImageCroppedEvent): void {
+    this.croppedImage = this.sanitizer.bypassSecurityTrustUrl(
+      event.objectUrl || '',
+    );
+    this.tempCroppedBlob = event.blob || null;
+  }
+
+  imageLoaded(image: LoadedImage): void {
+    // الصورة اتحملت
+  }
+
+  loadImageFailed(): void {
+    this.errorMessage = 'فشل تحميل الصورة، جرب صورة أخرى';
+    this.showCropModal = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmCrop(): void {
+    if (this.tempCroppedBlob) {
+      const croppedFile = new File(
+        [this.tempCroppedBlob],
+        `doctor-image-${Date.now()}.png`,
+        { type: 'image/png' },
+      );
+      this.doctor.doctorImageFile = croppedFile;
+
+      // 🔥🔥🔥 التعديل الوحيد المطلوب 🔥🔥🔥
+      this.doctor.doctorImage = URL.createObjectURL(this.tempCroppedBlob);
+
+    }
+    this.showCropModal = false;
+    this.imageChangedEvent = null;
+    this.cdr.detectChanges();
+  }
+
+  cancelCrop(): void {
+    this.showCropModal = false;
+    this.imageChangedEvent = null;
+    this.doctorImage.nativeElement.value = ''; // نرجع الـ input فاضي
+    this.cdr.detectChanges();
   }
 
   async handleSubmit(): Promise<void> {
@@ -189,14 +246,14 @@ export class EditDoctorComponent {
 
     try {
       const response = await firstValueFrom(
-        this.apiService.updateDoctor(formData, this.doctor.id)
+        this.apiService.updateDoctor(formData, this.doctor.id),
       );
       console.log('Response from API:', response);
       if (response.success) {
         this.successMessage = 'تم تحديث بيانات الدكتور بنجاح';
         setTimeout(
           () => this.router.navigate(['/doctor-details', this.doctor.id]),
-          2000
+          2000,
         );
       } else {
         this.errorMessage = 'فشل في تحديث بيانات الدكتور';

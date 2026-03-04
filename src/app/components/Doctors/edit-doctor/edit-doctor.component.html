@@ -58,8 +58,40 @@
                   style="font-size: 14px;"></i>
               </div>
             </div>
-            <span *ngIf="doctor.doctorImageFile" class="text-success mt-4 d-block">تم رفع الصورة: {{
+            <span *ngIf="doctor.doctorImageFile" class="text-success mt-4 d-block"> تم رفع وقص الصورة: {{
               doctor.doctorImageFile.name }}</span>
+          </div>
+
+          <!-- 🔥 مودال القص (زي الفيسبوك بالضبط) -->
+          <div *ngIf="showCropModal" class="modal fade show d-block"
+            style="background: rgba(0,0,0,0.6); z-index: 1050;">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">قص الصورة بنسبة 4:3 (اجباري)</h5>
+                  <button type="button" class="btn-close" (click)="cancelCrop()"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true"
+                    [aspectRatio]="4 / 3" [resizeToWidth]="800" [onlyScaleDown]="true" format="png" output="blob"
+                    (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded($event)"
+                    (loadImageFailed)="loadImageFailed()">
+                  </image-cropper>
+
+                  <!-- معاينة مباشرة بعد القص -->
+                  <div *ngIf="croppedImage" class="mt-4">
+                    <h6 class="text-success">معاينة بعد القص:</h6>
+                    <img [src]="croppedImage" class="img-fluid rounded shadow" style="max-height: 300px;" />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" (click)="cancelCrop()">إلغاء</button>
+                  <button type="button" class="btn btn-primary" (click)="confirmCrop()">
+                    <i class="fa-solid fa-check"></i> تأكيد القص واستخدام الصورة
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

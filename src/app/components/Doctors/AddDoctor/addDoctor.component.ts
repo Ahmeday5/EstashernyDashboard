@@ -11,10 +11,18 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from '../../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 
+// 🔥 الإضافات الجديدة للـ cropper
+import {
+  ImageCropperComponent,
+  ImageCroppedEvent,
+  LoadedImage,
+} from 'ngx-image-cropper';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-add-doctor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageCropperComponent],
   templateUrl: './addDoctor.component.html',
   styleUrls: ['./addDoctor.component.scss'],
 })
@@ -49,10 +57,17 @@ export class addDoctorComponent implements OnInit {
   doctorImagePreview: string = '/assets/img/doctors/upload.png'; // متغير جديد لعرض الصورة المؤقتة
   certFileName: string | null = null; // متغير لعرض اسم الملف المرفوع
 
+  // 🔥 متغيرات الـ Cropper الجديدة
+  imageChangedEvent: Event | null = null;
+  croppedImage: SafeUrl = '';
+  tempCroppedBlob: Blob | null = null;
+  showCropModal: boolean = false;
+
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer, // 🔥 ضروري للـ preview الآمن
   ) {}
 
   ngOnInit(): void {
@@ -80,53 +95,67 @@ export class addDoctorComponent implements OnInit {
     this.certUpload.nativeElement.click();
   }
 
+  // 🔥 الدالة الجديدة (بدل التحقق القديم من النسبة)
   onImageUpload(event: Event): void {
     const input = event.target as HTMLInputElement;
-
     if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-
-      img.onload = () => {
-        const width = img.width;
-        const height = img.height;
-
-        const ratio = width / height;
-        const targetRatio = 4 / 3;
-
-        if (Math.abs(ratio - targetRatio) > 0.01) {
-          this.errorMessage = 'يجب أن تكون الصورة بنسبة 4:3';
-          this.doctor.doctorImageFile = null;
-          this.doctorImagePreview = '/assets/img/doctors/upload.png';
-          input.value = '';
-          this.cdr.detectChanges();
-          return;
-        }
-
-        // لو تمام
-        this.errorMessage = '';
-        this.doctor.doctorImageFile = file;
-        this.doctorImagePreview = objectUrl;
-        this.cdr.detectChanges();
-      };
-
-      img.src = objectUrl;
+      this.imageChangedEvent = event; // 🔥 نبعت الحدث للـ cropper
+      this.showCropModal = true; // 🔥 نفتح المودال فوراً
+      this.doctor.doctorImageFile = null; // لسه ما اتقصش
+      this.cdr.detectChanges();
     }
   }
 
   onCertUpload(event: Event): void {
-    console.log('Certificate upload triggered', event);
-    event.preventDefault();
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      console.log('Selected file:', input.files[0].name);
       this.doctor.certificateFile = input.files[0];
-      this.certFileName = input.files[0].name; // تحديث اسم الملف
+      this.certFileName = input.files[0].name;
       input.value = '';
       this.cdr.detectChanges();
     }
+  }
+
+  // 🔥 الدوال الجديدة للـ Cropper
+  imageCropped(event: ImageCroppedEvent): void {
+    this.croppedImage = this.sanitizer.bypassSecurityTrustUrl(
+      event.objectUrl || '',
+    );
+    this.tempCroppedBlob = event.blob || null;
+  }
+
+  imageLoaded(image: LoadedImage): void {
+    // الصورة اتحملت
+  }
+
+  loadImageFailed(): void {
+    this.errorMessage = 'فشل تحميل الصورة، جرب صورة أخرى';
+    this.showCropModal = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmCrop(): void {
+    if (this.tempCroppedBlob) {
+      const croppedFile = new File(
+        [this.tempCroppedBlob],
+        `doctor-image-${Date.now()}.png`,
+        { type: 'image/png' },
+      );
+      this.doctor.doctorImageFile = croppedFile;
+
+      // تحديث الـ preview الرئيسي
+      this.doctorImagePreview = URL.createObjectURL(this.tempCroppedBlob);
+    }
+    this.showCropModal = false;
+    this.imageChangedEvent = null;
+    this.cdr.detectChanges();
+  }
+
+  cancelCrop(): void {
+    this.showCropModal = false;
+    this.imageChangedEvent = null;
+    this.doctorImage.nativeElement.value = ''; // نرجع الـ input فاضي
+    this.cdr.detectChanges();
   }
 
   async handleSubmit(): Promise<void> {
