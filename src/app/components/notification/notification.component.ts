@@ -19,7 +19,7 @@ export class NotificationComponent {
   successMessage: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
-
+  
   constructor(private http: HttpClient) {}
 
   isValidImageUrl(url: string): boolean {
