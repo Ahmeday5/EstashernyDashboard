@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 // CKEditor
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { ToastService } from '../../shared/services/toast.service';
 @Component({
   selector: 'app-privacy-policy',
   standalone: true,
@@ -23,12 +24,11 @@ export class PrivacyPolicyComponent implements OnInit {
   editorContent: string = ''; // محتوى المحرر
   selectedPageType: number = 1; // 1 -> Doctors, 2 -> Patients
   updating = false;
-  successMessage = '';
-  errorMessage = '';
 
   constructor(
     private apiService: ApiService,
     private sanitizer: DomSanitizer,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -77,12 +77,11 @@ export class PrivacyPolicyComponent implements OnInit {
       .updateStaticPage(pageTypeNumber, this.editorContent)
       .subscribe({
         next: (res) => {
-          this.successMessage = 'تم التحديث بنجاح!';
+          this.toast.success('تم التحديث بنجاح!');
           this.loadPrivacyPolicy(this.selectedPageType);
           this.updating = false;
         },
         error: (err) => {
-          this.errorMessage = err.message || 'حدث خطأ';
           this.updating = false;
         },
       });

@@ -1,26 +1,254 @@
-.header {
-  height: 10vh;
-  font-family: var(--font-latin); /* الخط العربي */
-  font-weight: 600; /* وزن الخط */
-  line-height: 100%; /* ارتفاع السطر */
-  text-align: left; /* محاذاة النص لليمين */
-  padding: 10px 0;
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 76px;
+  padding: 0 28px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 900;
 }
 
-.header h6 {
+/* ── Start: title / breadcrumb ── */
+.ah-start {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.ah-mobile-menu {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+
+  @media (max-width: 992px) {
+    display: flex;
+  }
+}
+
+.ah-titles {
+  min-width: 0;
+}
+
+.ah-title {
+  margin: 0;
+  font-family: var(--font-arabic), var(--font-latin), sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ah-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.ah-crumb--active {
   color: var(--second-color);
-  font-weight: bold;
-  font-size: 25px;
+  font-weight: 600;
 }
 
-.header .imgs {
-  margin-right: 15px;
-  background: transparent;
+.ah-crumb-sep {
+  font-size: 10px;
+  color: var(--text-muted);
 }
 
-.header img {
-  width: 70px;
-  height: 70px;
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  background: var(--thrid-color) !important;
+/* ── End: notifications / user ── */
+.ah-end {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.ah-icon-btn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  font-size: 16px;
+  position: relative;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    background: var(--second-color-light);
+    color: var(--second-color);
+  }
+}
+
+/* ── User menu ── */
+.ah-user {
+  position: relative;
+}
+
+.ah-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-muted);
+  }
+}
+
+.ah-user--open .ah-user-btn {
+  background: var(--bg-muted);
+  border-color: var(--border-color);
+}
+
+.ah-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bg-surface);
+  outline: 2px solid var(--main-color-light);
+}
+
+.ah-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.3;
+
+  @media (max-width: 576px) {
+    display: none;
+  }
+}
+
+.ah-user-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ah-user-role {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ah-user-caret {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform var(--transition-base);
+
+  @media (max-width: 576px) {
+    display: none;
+  }
+}
+
+.ah-user--open .ah-user-caret {
+  transform: rotate(180deg);
+}
+
+.ah-user-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  min-width: 220px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 950;
+  animation: ah-menu-in 0.16s var(--ease);
+}
+
+@keyframes ah-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ah-user-menu-header {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ah-user-menu-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.ah-user-menu-role {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.ah-user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: right;
+  transition: background-color var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-muted);
+  }
+}
+
+.ah-user-menu-item--danger {
+  color: var(--color-danger);
+
+  &:hover {
+    background: var(--color-danger-bg);
+  }
+}
+
+@media (max-width: 576px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .ah-title {
+    font-size: 17px;
+  }
 }

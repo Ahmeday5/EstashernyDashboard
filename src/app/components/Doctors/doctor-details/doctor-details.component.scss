@@ -1,116 +1,281 @@
-.header-content {
-  width: 100%;
-  background: var(--second-color);
-  padding: 20px;
-  color: var(--thrid-color);
-  border: 1px solid var(--second-color);
-  border-radius: 5px;
+.dd-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.header-content h3 {
-  font-weight: bold;
-  font-size: 35px;
-  line-height: 100%;
+.dd-loading {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
 }
 
-.header-content h6 {
-  font-weight: 500;
-  font-style: Medium;
-  font-size: 18px;
-  line-height: 100%;
+/* ── Profile header ── */
+.dd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px 32px;
+  background: var(--grad);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: #fff;
 }
 
-.header-content .btns {
-  margin-top: 15px;
+.dd-header-main {
+  display: flex;
+  align-items: center;
+  gap: 22px;
 }
 
-.header-content .btns .btn-edit,
-.header-content .btns .btn-delete {
-  background: var(--thrid-color);
-  width: 70px;
-  height: 30px;
-  margin-left: 15px;
+.dd-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.dd-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.35);
+}
+
+.dd-status {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.dd-status--off {
+  background: var(--color-danger);
+}
+
+.dd-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+  }
+}
+
+.dd-spec {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 12.5px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.dd-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.dd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter var(--transition-fast), transform var(--transition-fast);
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.dd-btn--sm {
+  padding: 7px 14px;
+  font-size: 12px;
+}
+
+.dd-btn--primary {
+  background: #fff;
   color: var(--second-color);
-  font-size: 15px;
-  font-weight: bold;
-  padding: 5px;
-  letter-spacing: 0.5px;
 }
 
-.DoctorImage {
-  width: 150px;
-  height: 150px;
-  margin-bottom: 10px;
+.dd-btn--danger {
+  background: var(--color-danger);
+  color: #fff;
 }
 
-.btn-viewPdf {
-  background: var(--main-color);
-  color: var( --thrid-color);
-  margin-right: 15px;
-  font-size: 20px;
+.dd-btn--warning {
+  background: var(--color-warning);
+  color: #4a2e00;
 }
 
-.experience {
-  background: var(--main-color);
-  width: 70%;
-  border-radius: 5px;
-  padding: 5px 0;
+.dd-btn--success {
+  background: var(--color-success);
+  color: #fff;
 }
 
-.experience h1 {
-  font-weight: bold;
-  font-size: 35px;
-  line-height: 100%;
-  text-align: center;
-  margin-top: 5px;
+.dd-experience {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.14);
 }
 
-.details-doctor {
-  width: 100%;
-  padding: 25px 0;
+.dd-experience-value {
+  font-size: 30px;
+  font-weight: 800;
 }
 
-.details-doctor .header h2 {
-  color: var(--main-color);
-  font-family: Inter;
-  font-weight: bold;
-  font-size: 35px;
-  line-height: 100%;
+.dd-experience-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.details-doctor .details {
-  padding: 15px;
+/* ── Info grid ── */
+.dd-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
-.details-doctor .details .content-details p{
-  font-weight: 500;
-  font-size: 20px;
-  text-align: right;
+.dd-info-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.dd-info-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--second-color-light);
   color: var(--second-color);
+  font-size: 16px;
 }
 
-.details-doctor .details .content-details p strong{
-  font-size: 25px;
+.dd-info-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 3px;
 }
 
-.desc img {
-  width: 150px;
-  height: 150px;
+.dd-info-value {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+/* ── Bio panel ── */
+.dd-panel {
+  padding: 26px 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.dd-panel-title {
+  margin: 0 0 16px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.dd-bio {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+}
+
+.dd-certificate {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dd-certificate-img {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: transform var(--transition-base);
+
+  &:hover {
+    transform: scale(1.03);
+  }
 }
 
 @media (max-width: 992px) {
-  .experience {
+  .dd-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dd-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dd-experience {
     width: 100%;
-    margin-top: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .dd-header-main {
+    flex-direction: column;
+    text-align: center;
   }
 
-  .experience h1 {
-    font-size: 30px;
-    margin-top: 5px;
+  .dd-identity {
+    align-items: center;
   }
 
-  .header-content .btns .btn-edit,
-  .header-content .btns .btn-delete {
-    margin-left: 5px;
+  .dd-actions {
+    justify-content: center;
   }
 }

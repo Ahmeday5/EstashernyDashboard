@@ -1,96 +1,105 @@
-.container {
-  padding-bottom: 20px;
+.ds-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.page-title {
-  background-color: var(--second-color);
-  color: var(--thrid-color);
-  width: 25%;
-  padding: 10px;
-  text-align: center;
-  border-radius: 12px;
-  font-weight: bold;
+.ds-header {
+  padding: 24px 28px;
+  background: var(--grad);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: #fff;
 }
 
-form .form-section {
-  margin-bottom: 15px;
+.ds-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 800;
 }
 
-form .form-section .form-label {
-  font-size: 22px;
-  font-weight: bold;
-  color: var(--second-color);
+.ds-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-form .form-section .form-control,
-form .form-section .form-select {
-  background: var(--thrid-color);
-  border: 1px solid var(--second-color);
-  padding: 12px 10px;
-  border-radius: 12px;
-  font-size: 18px;
+.ds-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
 }
 
-form .form-section .form-control:focus,
-form .form-section .form-select:focus {
-  border-color: var(--second-color);
-  box-shadow: none;
-  outline: none;
+.ds-form-card {
+  max-width: 560px;
+  padding: 28px 30px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-form .form-section .form-control::placeholder {
-  color: rgba(109, 105, 105, 1);
-  font-family: var(--font-arabic) !important;
+.ds-field {
+  margin-bottom: 18px;
+}
+
+.ds-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ds-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
   font-weight: 700;
-  font-size: 18px;
-  line-height: 100%;
+  color: var(--text-secondary);
 }
 
-// استايلات لحقل التاريخ
-.date-input-container {
-  position: relative;
-
-  // عكس اتجاه الحقل بحيث الأيقونة تكون على الشمال
-  input[type="date"] {
-    direction: ltr; // من اليسار لليمين عشان الفورمات يبقى على اليمين
-    text-align: right; // محاذاة النص لليمين
-    padding-left: 2.5rem; // مسافة للأيقونة على الشمال
-    font-size: 18px;
-    color: rgba(109, 105, 105, 1);
-    font-weight: 700;
-  }
-
-  // استايل الأيقونة (التقويم)
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    position: absolute;
-    left: 0.5rem; // وضع الأيقونة على الشمال
-    right: auto;
-    cursor: pointer;
-  }
+.ds-submit {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
 }
 
-form .btn-save {
-  width: 15%;
+.ds-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 40px;
+  border: none;
+  border-radius: var(--radius-md);
   background: var(--second-color);
-  color: var(--thrid-color);
-  font-size: 25px;
-  padding: 0;
-  font-weight: bold;
-  border-radius: 10px;
-}
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
 
-@media (max-width: 1563px) {
-  .page-title {
-    width: 35%;
+  &:hover:not(:disabled) {
+    background: var(--second-color-dark);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
-@media (max-width: 992px) {
-  .page-title {
-    width: 75%;
+@media (max-width: 576px) {
+  .ds-field-row {
+    grid-template-columns: 1fr;
   }
 
-  form .btn-save {
-    width: 50%;
+  .ds-form-card {
+    padding: 22px;
+  }
+
+  .ds-submit-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

@@ -1,13 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import {
-  ActivatedRoute,
-  NavigationEnd,
-  Router,
-  RouterModule,
-} from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter, map } from 'rxjs/operators';
+import { LayoutService } from '../../core/services/layout.service';
 
 @Component({
   selector: 'app-header',
@@ -17,86 +13,101 @@ import { filter, map } from 'rxjs/operators';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit {
-  breadcrumbs: { label: string; url: string }[] = []; // مصفوفة الـ breadcrumbs لتخزين الروابط وأسمائها
+  protected readonly layout = inject(LayoutService);
 
-  userData: any = null; // متغير بيخزن بيانات المستخدم من localStorage
-  username: string = 'ادمن'; // اسم المستخدم الافتراضي
-  userImage: string = '/assets/img/logo-login.png'; // صورة افتراضية
+  breadcrumbs: { label: string; url: string }[] = [];
+  pageTitle = '';
+
+  userData: any = null;
+  username = 'ادمن';
+  roleLabel = '';
+  userImage = '/assets/img/logo-login.png';
+
+  protected readonly userMenuOpen = signal(false);
+
+  private static readonly ROLE_LABELS: Record<string, string> = {
+    Admin: 'مدير النظام',
+    Editor: 'محرر',
+    Sales: 'مبيعات',
+    Marketing: 'تسويق',
+  };
 
   constructor(
-    private authService: AuthService, // حقن AuthService
-    private router: Router, // حقن Router
-    private activatedRoute: ActivatedRoute // حقن ActivatedRoute
+    private authService: AuthService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private elementRef: ElementRef,
   ) {}
 
   ngOnInit(): void {
-    // الاشتراك في أحداث التنقل لتحديث الـ breadcrumbs
     this.router.events
       .pipe(
-        filter((event) => event instanceof NavigationEnd), // تصفية الأحداث لأحداث إكمال التنقل فقط
-        map(() => this.activatedRoute), // الحصول على الروت الحالي
+        filter((event) => event instanceof NavigationEnd),
+        map(() => this.activatedRoute),
         map((route) => {
-          // البحث عن الروت الأساسي (root)
           while (route.firstChild) {
             route = route.firstChild;
           }
           return route;
         }),
-        map((route) => route.snapshot) // الحصول على snapshot للروت
+        map((route) => route.snapshot),
       )
       .subscribe((route) => {
-        this.breadcrumbs = this.getBreadcrumbs(route); // تحديث الـ breadcrumbs
+        this.breadcrumbs = this.getBreadcrumbs(route);
+        this.pageTitle = this.breadcrumbs[this.breadcrumbs.length - 1]?.label || '';
       });
 
-    // جلب بيانات المستخدم
     this.loadUserData();
   }
 
-  // دالة لبناء الـ breadcrumbs
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.userMenuOpen() && !this.elementRef.nativeElement.contains(event.target)) {
+      this.userMenuOpen.set(false);
+    }
+  }
+
+  toggleUserMenu(): void {
+    this.userMenuOpen.set(!this.userMenuOpen());
+  }
+
   private getBreadcrumbs(
     route: any,
     url: string = '',
-    breadcrumbs: { label: string; url: string }[] = []
+    breadcrumbs: { label: string; url: string }[] = [],
   ): { label: string; url: string }[] {
-    const routeData = route.data; // الحصول على بيانات الروت
-    const routeUrl = route.url
-      .map((segment: { path: any }) => segment.path)
-      .join('/'); // بناء عنوان URL الخاص بالروت
-    const label = routeData?.breadcrumb || ''; // الحصول على اسم breadcrumb من بيانات الروت
+    const routeData = route.data;
+    const routeUrl = route.url.map((segment: { path: any }) => segment.path).join('/');
+    const label = routeData?.breadcrumb || '';
 
-    // إضافة breadcrumb إذا كان موجود
     if (label) {
       breadcrumbs.push({ label, url: url + '/' + routeUrl });
     }
 
-    // إذا كان هناك روت فرعي، استمر في البحث
     if (route.firstChild) {
-      return this.getBreadcrumbs(
-        route.firstChild,
-        url + '/' + routeUrl,
-        breadcrumbs
-      );
+      return this.getBreadcrumbs(route.firstChild, url + '/' + routeUrl, breadcrumbs);
     }
 
-    return breadcrumbs; // إرجاع الـ breadcrumbs
+    return breadcrumbs;
   }
 
-  // دالة لتحميل بيانات المستخدم
   loadUserData(): void {
-    this.userData = this.authService.getUserData(); // جلب البيانات
-    if (this.userData) { // لو البيانات موجودة
-      this.username = `${this.userData.firstName}`; // تحديث الاسم
-      this.userImage = this.userData.picture && this.userData.picture !== 'N/A'
-        ? this.userData.picture
-        : '/assets/img/logo-login.png'; // تحديث الصورة
+    this.userData = this.authService.getUserData();
+    const role = this.authService.getCurrentRole();
+    this.roleLabel = (role && HeaderComponent.ROLE_LABELS[role]) || role || '';
+
+    if (this.userData) {
+      this.username = `${this.userData.firstName}`;
+      this.userImage =
+        this.userData.picture && this.userData.picture !== 'N/A'
+          ? this.userData.picture
+          : '/assets/img/logo-login.png';
     }
   }
 
-  // دالة تسجيل الخروج
   logout(): void {
-    this.authService.logout(); // استدعاء الخروج
-    this.router.navigate(['/']); // التوجيه للرئيسية
-    this.loadUserData(); // إعادة تحميل البيانات
+    this.userMenuOpen.set(false);
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
-
 }

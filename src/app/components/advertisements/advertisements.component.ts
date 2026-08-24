@@ -4,6 +4,9 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { PaginationComponent } from '../../layout/pagination/pagination.component';
+import { ToastService } from '../../shared/services/toast.service';
+import { ConfirmModalService } from '../../shared/components/confirm-modal/confirm-modal.service';
+import { staggerInAnimation } from '../../core/animations/list.animations';
 
 @Component({
   selector: 'app-advertisements',
@@ -11,6 +14,7 @@ import { PaginationComponent } from '../../layout/pagination/pagination.componen
   imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './advertisements.component.html',
   styleUrl: './advertisements.component.scss',
+  animations: [staggerInAnimation],
 })
 export class AdvertisementsComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
@@ -27,10 +31,13 @@ export class AdvertisementsComponent implements OnInit {
 
   Advertisement = { Title: '', ImageFile: null as File | null };
   errorMessage: string = '';
-  successMessage: string = '';
   isSubmitting: boolean = false;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private toast: ToastService,
+    private confirmModal: ConfirmModalService,
+  ) {}
 
   ngOnInit() {
     this.fetchAdvertisements(); // استدعاء الاعلانات في البداية
@@ -91,19 +98,14 @@ export class AdvertisementsComponent implements OnInit {
         }),
       );
 
-      this.successMessage = response.message;
+      this.toast.success(response.message || 'تم إضافة الإعلان بنجاح');
       this.form.resetForm();
       this.Advertisement.Title = '';
       this.Advertisement.ImageFile = null;
       this.fetchAdvertisements();
       formElement.classList.remove('was-validated');
-
-      setTimeout(() => {
-        this.successMessage = '';
-        this.errorMessage = '';
-      }, 3000);
     } catch (error: any) {
-      this.errorMessage = error.message || 'حدث خطأ أثناء الإرسال';
+      console.error('خطأ في إضافة الإعلان:', error);
     } finally {
       this.isSubmitting = false; // 🔹 انتهاء التحميل
     }
@@ -146,26 +148,27 @@ export class AdvertisementsComponent implements OnInit {
 
   /*************************delete Advertisement ***********************/
 
-  deleteAdvertisement(id: number) {
-    if (!confirm('هل أنت متأكد أنك تريد حذف هذا الإعلان؟')) return;
+  async deleteAdvertisement(id: number) {
+    const confirmed = await this.confirmModal.confirm({
+      title: 'حذف الإعلان',
+      message: 'هل أنت متأكد أنك تريد حذف هذا الإعلان؟',
+      confirmLabel: 'حذف',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
     this.apiService.deleteAdvertisements(id).subscribe({
       next: (response) => {
         if (response.success) {
-          this.successMessage = response.message || 'تم حذف الإعلان بنجاح';
-          setTimeout(() => (this.successMessage = ''), 3000);
-
+          this.toast.success(response.message || 'تم حذف الإعلان بنجاح');
           // إعادة تحميل الصفحة الحالية بعد الحذف
           this.fetchAdvertisements(this.currentPage);
         } else {
-          this.errorMessage = response.message || 'فشل في حذف الإعلان';
-          setTimeout(() => (this.errorMessage = ''), 3000);
+          this.toast.error(response.message || 'فشل في حذف الإعلان');
         }
       },
       error: (error) => {
         console.error('خطأ في حذف الإعلان:', error);
-        this.errorMessage = error.message || 'حدث خطأ أثناء الحذف';
-        setTimeout(() => (this.errorMessage = ''), 3000);
       },
     });
   }

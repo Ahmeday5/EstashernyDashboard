@@ -10,6 +10,10 @@ import {
 } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { PaginationComponent } from "../../../layout/pagination/pagination.component";
+import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../shared/services/toast.service';
+import { ConfirmModalService } from '../../../shared/components/confirm-modal/confirm-modal.service';
+import { staggerInAnimation } from '../../../core/animations/list.animations';
 
 @Component({
   selector: 'app-alldoctor',
@@ -17,6 +21,7 @@ import { PaginationComponent } from "../../../layout/pagination/pagination.compo
   imports: [CommonModule, RouterModule, PaginationComponent],
   templateUrl: './alldoctor.component.html',
   styleUrl: './alldoctor.component.scss',
+  animations: [staggerInAnimation],
 })
 export class AlldoctorComponent implements OnInit {
   specialities: any[] = [];
@@ -30,13 +35,21 @@ export class AlldoctorComponent implements OnInit {
   pages: number[] = [];
   noDoctorsMessage: string | null = null;
   searchQuery: string = '';
+  isAdmin: boolean = false;
 
   @ViewChild('searchInput', { static: false })
   searchInput!: ElementRef<HTMLInputElement>;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+    private toast: ToastService,
+    private confirmModal: ConfirmModalService,
+  ) {}
 
   ngOnInit() {
+    const role = this.authService.getCurrentRole();
+    this.isAdmin = role ? role.includes('Admin') : false;
     this.fetchSpecialities();
     this.fetchAllDoctors();
     this.setupSearchListener();
@@ -212,5 +225,74 @@ export class AlldoctorComponent implements OnInit {
     } else {
       console.error('حقل البحث غير موجود');
     }
+  }
+
+  /************ إجراءات مباشرة من الكارت ******************/
+  async deleteDoctorFromCard(event: Event, doctor: any): Promise<void> {
+    event.stopPropagation();
+    if (!this.isAdmin) {
+      this.toast.error('ليس لديك صلاحية لحذف الدكتور');
+      return;
+    }
+
+    const confirmed = await this.confirmModal.confirm({
+      title: 'حذف الدكتور',
+      message: `هل أنت متأكد من حذف "${doctor.name}"؟ هذا الإجراء لا يمكن التراجع عنه!`,
+      confirmLabel: 'حذف',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
+    this.apiService.deleteDoctor(doctor.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toast.success('تم حذف الدكتور بنجاح');
+          this.doctors = this.doctors.filter((d) => d.id !== doctor.id);
+          this.updatePagination();
+        } else {
+          this.toast.error(response.message || 'فشل في حذف الدكتور');
+        }
+      },
+      error: (error) => {
+        console.error('خطأ في حذف الدكتور:', error);
+      },
+    });
+  }
+
+  async toggleActiveFromCard(event: Event, doctor: any): Promise<void> {
+    event.stopPropagation();
+    if (!this.isAdmin) {
+      this.toast.error('ليس لديك صلاحية لتغيير حالة الدكتور');
+      return;
+    }
+
+    const activating = doctor.isActive === false;
+    const confirmed = await this.confirmModal.confirm({
+      title: activating ? 'تنشيط الدكتور' : 'حظر الدكتور',
+      message: activating
+        ? `هل أنت متأكد من تنشيط "${doctor.name}"؟`
+        : `هل أنت متأكد من حظر "${doctor.name}"؟`,
+      confirmLabel: activating ? 'تنشيط' : 'حظر',
+      tone: activating ? 'primary' : 'warning',
+    });
+    if (!confirmed) return;
+
+    const request$ = activating
+      ? this.apiService.activeDoctor(doctor.id)
+      : this.apiService.inactiveDoctor(doctor.id);
+
+    request$.subscribe({
+      next: (response) => {
+        if (response.success) {
+          doctor.isActive = activating;
+          this.toast.success(activating ? 'تم تنشيط الدكتور بنجاح' : 'تم حظر الدكتور بنجاح');
+        } else {
+          this.toast.error(response.message || 'فشلت العملية');
+        }
+      },
+      error: (error) => {
+        console.error('خطأ في تغيير حالة الدكتور:', error);
+      },
+    });
   }
 }

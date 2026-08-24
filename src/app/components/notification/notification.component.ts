@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-notification',
@@ -16,11 +17,12 @@ export class NotificationComponent {
   body: string = '';
   topic: string = 'patient'; // الافتراضي
   imageUrl: string = '';
-  successMessage: string = '';
-  errorMessage: string = '';
   isLoading: boolean = false;
-  
-  constructor(private http: HttpClient) {}
+
+  constructor(
+    private http: HttpClient,
+    private toast: ToastService,
+  ) {}
 
   isValidImageUrl(url: string): boolean {
     if (!url) return true; // فاضي يبقى تمام
@@ -30,13 +32,9 @@ export class NotificationComponent {
   }
 
   async sendNotification() {
-    this.successMessage = '';
-    this.errorMessage = '';
-
     // تحقق من رابط الصورة
     if (!this.isValidImageUrl(this.imageUrl)) {
-      this.errorMessage =
-        'رابط الصورة غير صالح. يجب أن يبدأ بـ https وينتهي بـ jpg أو jpeg أو png';
+      this.toast.error('رابط الصورة غير صالح. يجب أن يبدأ بـ https وينتهي بـ jpg أو jpeg أو png');
       return;
     }
 
@@ -55,18 +53,13 @@ export class NotificationComponent {
         ),
       );
       console.log('Notification sent:', response);
-      this.successMessage = 'تم إرسال الإشعار بنجاح';
-      setTimeout(() => {
-        this.successMessage = '';
-        // 👇 تفريغ الحقول بعد النجاح
-        this.title = '';
-        this.body = '';
-        this.topic = 'patient';
-        this.imageUrl = '';
-      }, 2000);
+      this.toast.success('تم إرسال الإشعار بنجاح');
+      this.title = '';
+      this.body = '';
+      this.topic = 'patient';
+      this.imageUrl = '';
     } catch (error: any) {
       console.error('Error sending notification:', error);
-      this.errorMessage = 'فشل في إرسال الإشعار';
     } finally {
       this.isLoading = false;
     }

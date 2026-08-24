@@ -1,0 +1,27 @@
+@if (confirmService.state(); as state) {
+<div class="cm-backdrop" (click)="respond(false)">
+  <div class="cm-dialog" [class.cm-dialog--warning]="state.tone === 'warning'" [class.cm-dialog--primary]="state.tone === 'primary'" (click)="$event.stopPropagation()" role="alertdialog" aria-modal="true">
+    <div class="cm-icon">
+      @switch (state.tone) {
+        @case ('warning') {
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        }
+        @case ('primary') {
+        <i class="fa-solid fa-circle-question"></i>
+        }
+        @default {
+        <i class="fa-solid fa-trash-can"></i>
+        }
+      }
+    </div>
+
+    <h2 class="cm-title">{{ state.title }}</h2>
+    <p class="cm-message">{{ state.message }}</p>
+
+    <div class="cm-actions">
+      <button type="button" class="cm-btn cm-btn--ghost" (click)="respond(false)">{{ state.cancelLabel }}</button>
+      <button type="button" class="cm-btn cm-btn--solid" (click)="respond(true)">{{ state.confirmLabel }}</button>
+    </div>
+  </div>
+</div>
+}

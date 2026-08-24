@@ -1,6 +1,6 @@
-<div class="container-fluid mt-5">
+<div class="dd-page">
   @if (loading) {
-  <div class="text-center">
+  <div class="dd-loading">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
@@ -10,80 +10,95 @@
     {{ errorMessage }}
   </div>
   } @else {
-  @if (successMessage) {
-  <div class="alert alert-success text-center">
-    {{ successMessage }}
-  </div>
-  }
-  <div class="row">
-    <div class="col-md-12">
-      <div class="header-content">
-        <div class="row justify-content-between">
-          <div class="col-md-5">
-            <div class="row justify-content-between">
-              <div class="col-md-3">
-                <img [src]="doctor.doctorImage" class="img-fluid rounded-circle d-inline-block DoctorImage"
-                  alt="Doctor Image" alt="">
-              </div>
-              <div class="col-md-8">
-                <h3>د/ {{ doctor.name }}</h3>
-                <h6>{{ doctor.specialization }}</h6>
-                <div class="btns">
-                  <button class="btn btn-edit" (click)="onEdit()">تعديل</button>
-                  @if (this.isAdmin) {
-                  <button class="btn btn-delete" (click)="onDelete()">حذف</button>
-                  @if (doctor.isActive == false) {
-                  <button class="btn btn-delete" (click)="activeDoc()">تنشيط</button>
-                  }@else {
-                  <button class="btn btn-delete" (click)="inactiveDoc()">حظر</button>
-                  }
-                  }
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-5 text-center align-content-center">
-            <div class="experience">
-              <h1>{{ doctor.yearsOfExperience }} سنوات خبرة</h1>
-            </div>
-          </div>
+
+  <!-- Profile header -->
+  <div class="dd-header">
+    <div class="dd-header-main">
+      <div class="dd-avatar-wrap">
+        <img [src]="doctor.doctorImage" class="dd-avatar" alt="{{ doctor.name }}">
+        <span class="dd-status" [class.dd-status--off]="doctor.isActive === false">
+          {{ doctor.isActive === false ? 'غير نشط' : 'نشط' }}
+        </span>
+      </div>
+
+      <div class="dd-identity">
+        <h1>د. {{ doctor.name }}</h1>
+        <span class="dd-spec">{{ doctor.specialization }}</span>
+
+        <div class="dd-actions">
+          <button class="dd-btn dd-btn--primary" (click)="onEdit()">
+            <i class="fa-solid fa-pen"></i> تعديل
+          </button>
+          @if (isAdmin) {
+          <button class="dd-btn dd-btn--danger" (click)="onDelete()">
+            <i class="fa-solid fa-trash-can"></i> حذف
+          </button>
+          @if (doctor.isActive == false) {
+          <button class="dd-btn dd-btn--success" (click)="activeDoc()">
+            <i class="fa-solid fa-check"></i> تنشيط
+          </button>
+          } @else {
+          <button class="dd-btn dd-btn--warning" (click)="inactiveDoc()">
+            <i class="fa-solid fa-ban"></i> حظر
+          </button>
+          }
+          }
         </div>
       </div>
     </div>
 
-    <div class="col-md-12">
-      <div class="details-doctor">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="header">
-              <h2>الملف الشخصي</h2>
-            </div>
-          </div>
-          <div class="col-md-12">
-            <div class="row details">
-              <div class="col-md-12 content-details">
-                <p><strong> البريد الالكتروني :</strong> {{ doctor.email }}</p>
-                <p><strong>رقم الهاتف :</strong> {{ doctor.phone }}</p>
-                <p><strong>سعر الكشف :</strong> {{ doctor.examenPrice }} جنيه</p>
-                <p></p>
-                <p class="desc"><strong>تفاصيل :</strong> {{ doctor.profileInfo }}</p>
-                <p class="desc">
-                  <strong>الشهادات :</strong>
-                  @if (isImage(doctor.doctorCertificate)) {
-                  <img [src]="doctor.doctorCertificate" alt="doctorCertificate" class="img-fluid certificate-img"
-                    (click)="openImageModal(doctor.doctorCertificate)" style="cursor: pointer; max-width: 200px;">
-                  } @else {
-                  <a [href]="doctor.doctorCertificate" target="_blank" class="btn btn-viewPdf btn-sm">عرض الملف</a>
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="dd-experience">
+      <span class="dd-experience-value">{{ doctor.yearsOfExperience }}</span>
+      <span class="dd-experience-label">سنوات خبرة</span>
+    </div>
+  </div>
+
+  <!-- Info grid -->
+  <div class="dd-info-grid">
+    <div class="dd-info-card">
+      <div class="dd-info-icon"><i class="fa-solid fa-envelope"></i></div>
+      <div>
+        <span class="dd-info-label">البريد الإلكتروني</span>
+        <span class="dd-info-value">{{ doctor.email }}</span>
+      </div>
+    </div>
+
+    <div class="dd-info-card">
+      <div class="dd-info-icon"><i class="fa-solid fa-phone"></i></div>
+      <div>
+        <span class="dd-info-label">رقم الهاتف</span>
+        <span class="dd-info-value">{{ doctor.phone }}</span>
+      </div>
+    </div>
+
+    <div class="dd-info-card">
+      <div class="dd-info-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+      <div>
+        <span class="dd-info-label">سعر الكشف</span>
+        <span class="dd-info-value">{{ doctor.examenPrice }} جنيه</span>
       </div>
     </div>
   </div>
+
+  <!-- Bio + certificate -->
+  <div class="dd-panel">
+    <h2 class="dd-panel-title">الملف الشخصي</h2>
+    <p class="dd-bio">{{ doctor.profileInfo }}</p>
+
+    <div class="dd-certificate">
+      <span class="dd-info-label">الشهادات</span>
+      @if (isImage(doctor.doctorCertificate)) {
+      <img [src]="doctor.doctorCertificate" alt="doctorCertificate" class="dd-certificate-img"
+        (click)="openImageModal(doctor.doctorCertificate)">
+      } @else {
+      <a [href]="doctor.doctorCertificate" target="_blank" class="dd-btn dd-btn--primary dd-btn--sm">
+        <i class="fa-solid fa-file-arrow-down"></i> عرض الملف
+      </a>
+      }
+    </div>
+  </div>
   }
+
   <!-- Bootstrap Modal لعرض الصورة -->
   <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

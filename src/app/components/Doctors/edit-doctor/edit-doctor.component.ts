@@ -3,7 +3,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
 
@@ -14,6 +14,7 @@ import {
   LoadedImage,
 } from 'ngx-image-cropper';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-edit-doctor',
@@ -54,7 +55,6 @@ export class EditDoctorComponent {
 
   specializations: { id: number; name: string }[] = [];
   errorMessage: string = '';
-  successMessage: string = '';
   certFileName: string | null = null; // متغير لعرض اسم الملف المرفوع
 
   // 🔥 متغيرات الـ Cropper الجديدة
@@ -70,6 +70,7 @@ export class EditDoctorComponent {
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer, // 🔥 ضروري للـ preview الآمن
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -185,7 +186,7 @@ export class EditDoctorComponent {
   }
 
   loadImageFailed(): void {
-    this.errorMessage = 'فشل تحميل الصورة، جرب صورة أخرى';
+    this.toast.error('فشل تحميل الصورة، جرب صورة أخرى');
     this.showCropModal = false;
     this.cdr.detectChanges();
   }
@@ -223,9 +224,6 @@ export class EditDoctorComponent {
       return;
     }
 
-    this.errorMessage = '';
-    this.successMessage = '';
-
     const formData = new FormData();
     formData.append('Id', this.doctor.id);
     formData.append('Name', this.doctor.name);
@@ -250,26 +248,12 @@ export class EditDoctorComponent {
       );
       console.log('Response from API:', response);
       if (response.success) {
-        this.successMessage = 'تم تحديث بيانات الدكتور بنجاح';
-        setTimeout(
-          () => this.router.navigate(['/doctor-details', this.doctor.id]),
-          2000,
-        );
+        this.toast.success('تم تحديث بيانات الدكتور بنجاح');
+        this.router.navigate(['/doctor-details', this.doctor.id]);
       } else {
-        this.errorMessage = 'فشل في تحديث بيانات الدكتور';
+        this.toast.error('فشل في تحديث بيانات الدكتور');
       }
     } catch (error: any) {
-      let errorMessage = 'حدث خطأ أثناء التحديث';
-      if (error && typeof error === 'object' && 'message' in error) {
-        errorMessage = error.message;
-      } else if (
-        error instanceof HttpErrorResponse &&
-        error.error &&
-        typeof error.error === 'string'
-      ) {
-        errorMessage = error.error;
-      }
-      this.errorMessage = errorMessage;
       console.error('خطأ في تحديث الدكتور:', error);
     }
   }

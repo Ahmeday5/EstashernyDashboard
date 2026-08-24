@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../shared/services/toast.service';
 
 // واجهة لتعريف شكل بيانات الدكتور
 interface Doctor {
@@ -34,10 +35,11 @@ export class DiscountComponent implements OnInit {
   loading: boolean = true; // متغير للتحكم في الـ Spinner
   nospecialitiesMessage: string | null = null; // رسالة لو مفيش دكاترة
   discount: Discount = { doctorId: '', date: '', discountPercentage: null }; // تهيئة الكائن بقيم null
-  errorMessage: string = ''; // رسالة الخطأ
-  successMessage: string = ''; // رسالة النجاح
 
-  constructor(private apiService: ApiService) {} // حقن الـ ApiService
+  constructor(
+    private apiService: ApiService,
+    private toast: ToastService,
+  ) {}
 
   ngOnInit() {
     // دالة التهيئة
@@ -81,7 +83,7 @@ export class DiscountComponent implements OnInit {
       !this.discount.date ||
       this.discount.discountPercentage === null
     ) {
-      this.errorMessage = 'يرجى ملء جميع الحقول';
+      this.toast.error('يرجى ملء جميع الحقول');
       return;
     }
 
@@ -99,23 +101,16 @@ export class DiscountComponent implements OnInit {
       );
       if (response.success) {
         // لو الإضافة نجحت
-        this.successMessage = response.message;
+        this.toast.success(response.message || 'تم تطبيق الخصم بنجاح');
         this.form.resetForm(); // إعادة ضبط الفورم
         this.discount = { doctorId: '', date: '', discountPercentage: null }; // إعادة ضبط الكائن
         formElement.classList.remove('was-validated');
       } else {
         // لو فشل (مثلاً مفيش مواعيد)
-        this.errorMessage = response.message;
+        this.toast.error(response.message || 'فشل في تطبيق الخصم');
       }
     } catch (error: any) {
-      this.errorMessage = error.message || 'حدث خطأ أثناء إضافة الخصم';
       console.error('خطأ في إضافة الخصم:', error);
     }
-
-    // إخفاء الرسائل بعد 5 ثواني
-    setTimeout(() => {
-      this.successMessage = '';
-      this.errorMessage = '';
-    }, 5000);
   }
 }

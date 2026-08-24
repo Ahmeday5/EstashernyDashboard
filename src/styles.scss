@@ -1,26 +1,328 @@
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
 :root {
+  /* Brand */
   --main-color: #14c8c7;
+  --main-color-dark: #0fa3a2;
+  --main-color-light: #e6fbfb;
   --second-color: #4b4e9c;
+  --second-color-dark: #383a75;
+  --second-color-light: #eceafc;
   --thrid-color: #f0f0f0;
-  --bg-main: #f0f0f0;
-  --font-arabic: "Noto Sans Arabic"; /* الخط العربي الافتراضي */
-  --font-latin: "Inter"; /* الخط اللاتيني الافتراضي */
+  --third-color: #f0f0f0; /* alias: legacy typo used across some components */
+
+  /* App surfaces (light) */
+  --bg-main: #f4f5fa;
+  --bg-surface: #ffffff;
+  --bg-muted: #f7f8fc;
+  --border-color: #e3e5f0;
+
+  /* Text (light) */
+  --text-primary: #22243a;
+  --text-secondary: #6b6f8c;
+  --text-muted: #9a9dbb;
+  --text-on-brand: #ffffff;
+
+  /* Dark surfaces — a dark tint of the brand's second-color, used by the sidebar / dark chrome */
+  --surface: #1e2050;
+  --surface2: #262a63;
+  --surface3: #2f3475;
+  --border: #363b82;
+  --txt: #f3f4fc;
+  --txt2: #c2c4e8;
+  --txt3: #9497cf;
+  --txt4: #5c60a3;
+  --grad: linear-gradient(135deg, var(--second-color-dark), var(--second-color) 55%, var(--main-color));
+
+  /* Feedback */
+  --color-success: #1fb573;
+  --color-success-bg: #e8f8f0;
+  --color-danger: #e3455a;
+  --color-danger-bg: #fdeaee;
+  --color-warning: #f2a93c;
+  --color-warning-bg: #fef3e2;
+  --color-info: #2f8fe0;
+  --color-info-bg: #e8f2fc;
+
+  /* Typography */
+  --font-arabic: "Cairo";
+  --font-latin: "Inter";
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(34, 36, 58, 0.05);
+  --shadow-sm: 0 2px 8px rgba(34, 36, 58, 0.06);
+  --shadow-md: 0 8px 24px rgba(34, 36, 58, 0.08);
+  --shadow-lg: 0 16px 40px rgba(34, 36, 58, 0.12);
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s var(--ease);
+  --transition-base: 0.25s var(--ease);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  margin: 0 !important; /* إزالة الهوامش الافتراضية */
-  font-family: var(--font-latin) !important; /* الخط الافتراضي للنصوص العربية */
-  direction: rtl; /* اتجاه النص من اليمين للشمال */
+  margin: 0 !important;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-arabic), var(--font-latin), sans-serif !important;
+  direction: rtl;
 }
 
-.form-control:focus {
-  outline: none; /* إزالة الإطار الأزرق الافتراضي */
-  box-shadow: 0 0 5px rgba(27, 116, 187, 0.5); /* إضافة ظل خفيف كبديل للـ outline */
+a {
+  color: var(--second-color);
 }
 
+::selection {
+  background: var(--main-color-light);
+  color: var(--second-color-dark);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d3d6e8;
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b7bbd9;
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
 .container-fluid {
   padding-right: 15px !important;
   padding-left: 15px !important;
   margin-right: 0 !important;
   margin-left: 0 !important;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+.form-control,
+.form-select {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--main-color);
+  box-shadow: 0 0 0 4px var(--main-color-light);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-check-input:checked {
+  background-color: var(--second-color);
+  border-color: var(--second-color);
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 3px var(--second-color-light);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), filter var(--transition-fast);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background-color: var(--second-color);
+  border-color: var(--second-color);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--second-color-dark);
+  border-color: var(--second-color-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-outline-primary {
+  color: var(--second-color);
+  border-color: var(--second-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--second-color);
+  border-color: var(--second-color);
+}
+
+/* ==========================================================================
+   Cards / surfaces
+   ========================================================================== */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+.table {
+  --bs-table-bg: transparent;
+  border-color: var(--border-color);
+}
+
+.table thead th {
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-width: 1.5px;
+  background: var(--bg-muted);
+}
+
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background-color: var(--bg-muted);
+}
+
+/* ==========================================================================
+   Badges / status pills
+   ========================================================================== */
+.badge {
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  padding: 0.4em 0.9em;
+}
+
+/* ==========================================================================
+   ngx-toastr — professional theme
+   ========================================================================== */
+.toast-container {
+  z-index: 1080;
+
+  .ngx-toastr {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 340px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    background-image: none !important;
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border-inline-start: 4px solid var(--color-info);
+    font-family: var(--font-arabic), var(--font-latin), sans-serif;
+    opacity: 1;
+  }
+
+  .toast-title {
+    font-weight: 800;
+    font-size: 14.5px;
+    margin-bottom: 2px;
+  }
+
+  .toast-message {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .toast-close-button {
+    color: var(--text-muted);
+    text-shadow: none;
+    opacity: 1;
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  .toast-close-button:hover {
+    color: var(--text-primary);
+  }
+
+  .toast-success {
+    border-inline-start-color: var(--color-success);
+    .toast-title { color: var(--color-success); }
+  }
+
+  .toast-error {
+    border-inline-start-color: var(--color-danger);
+    .toast-title { color: var(--color-danger); }
+  }
+
+  .toast-warning {
+    border-inline-start-color: var(--color-warning);
+    .toast-title { color: #a56a00; }
+  }
+
+  .toast-info {
+    border-inline-start-color: var(--color-info);
+    .toast-title { color: var(--color-info); }
+  }
+}
+
+/* ==========================================================================
+   Alerts
+   ========================================================================== */
+.alert {
+  border: none;
+  border-radius: var(--radius-md);
+}
+
+.alert-danger {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.alert-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.alert-warning {
+  background-color: var(--color-warning-bg);
+  color: #8a5a00;
 }

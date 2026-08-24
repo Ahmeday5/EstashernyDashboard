@@ -1,50 +1,66 @@
-<div class="container-fluid mb-3">
-  <div class="row">
-    <div class="col-md-12 page-name">
-      <h1 class="page-title">إضافة تنبيه</h1>
-    </div>
+<div class="nt-page">
 
-    <!-- الرسائل -->
-    <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+  <div class="nt-header">
+    <h1 class="nt-title">إضافة تنبيه</h1>
+    <p class="nt-subtitle">إرسال إشعار فوري للمرضى أو الدكاترة على المنصة</p>
+  </div>
 
-    <!-- الفورم -->
-    <form class="mt-2" (ngSubmit)="sendNotification()" #form="ngForm">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group mt-3">
-            <label for="topic">اختر الفئة</label>
-            <select id="topic" class="form-control" [(ngModel)]="topic" name="topic" required>
-              <option value="patient">المرضى</option>
-              <option value="doctor">الدكاترة</option>
-            </select>
-          </div>
+  <div class="nt-grid">
+    <form class="nt-form-card" (ngSubmit)="sendNotification()" #form="ngForm">
+
+      <div class="nt-field">
+        <label for="topic" class="nt-label">اختر الفئة</label>
+        <select id="topic" class="form-select" [(ngModel)]="topic" name="topic" required>
+          <option value="patient">المرضى</option>
+          <option value="doctor">الدكاترة</option>
+        </select>
+      </div>
+
+      <div class="nt-field">
+        <label for="title" class="nt-label">عنوان الإشعار</label>
+        <input id="title" class="form-control" [(ngModel)]="title" name="title" placeholder="عنوان الإشعار" required />
+      </div>
+
+      <div class="nt-field">
+        <label for="imageUrl" class="nt-label">لينك صورة الإشعار (اختياري)</label>
+        <input id="imageUrl" class="form-control" [(ngModel)]="imageUrl" name="imageUrl" placeholder="https://..." />
+      </div>
+
+      <div class="nt-field">
+        <label for="body" class="nt-label">محتوى الإشعار</label>
+        <textarea id="body" class="form-control" placeholder="نص الإشعار" rows="6" [(ngModel)]="body" name="body"
+          required></textarea>
+      </div>
+
+      <button class="nt-submit-btn" type="submit" [disabled]="isLoading || form.invalid">
+        @if (!isLoading) {
+        <span><i class="fa-solid fa-paper-plane"></i> إرسال الإشعار</span>
+        } @else {
+        <span><span class="spinner-border spinner-border-sm"></span> جاري الإرسال...</span>
+        }
+      </button>
+    </form>
+
+    <!-- Live preview -->
+    <div class="nt-preview">
+      <span class="nt-preview-label">معاينة الإشعار</span>
+      <div class="nt-preview-card">
+        <div class="nt-preview-icon">
+          <i class="fa-solid fa-bell"></i>
         </div>
-        <div class="col-md-6">
-          <div class="form-group mt-3">
-            <label for="title">عنوان الإشعار</label>
-            <input id="title" class="form-control" [(ngModel)]="title" name="title" required />
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group mt-3">
-            <label for="imageUrl">لينك صورة الإشعار (اختياري)</label>
-            <input id="imageUrl" class="form-control" [(ngModel)]="imageUrl" name="imageUrl" />
-          </div>
-        </div>
-        <div class="col-md-10">
-          <div class="form-section mt-3">
-            <label for="body">محتوى الإشعار</label>
-            <textarea id="body" class="form-control" placeholder="إضافة إشعار" rows="11" [(ngModel)]="body" name="body"
-              required></textarea>
-          </div>
-        </div>
-        <div class="col-12 d-flex justify-content-center text-center mt-2">
-          <button class="btn btn-save" type="submit" [disabled]="isLoading || form.invalid"><span
-              *ngIf="!isLoading">إرسال</span>
-            <span *ngIf="isLoading">جاري الإرسال...</span></button>
+        <div class="nt-preview-body">
+          <span class="nt-preview-title">{{ title || 'عنوان الإشعار' }}</span>
+          <span class="nt-preview-text">{{ body || 'سيظهر نص الإشعار هنا...' }}</span>
         </div>
       </div>
-    </form>
+      @if (imageUrl) {
+      <img [src]="imageUrl" alt="preview" class="nt-preview-img" />
+      }
+      <span class="nt-preview-target">
+        <i class="fa-solid fa-users"></i>
+        سيصل إلى: {{ topic === 'patient' ? 'المرضى' : 'الدكاترة' }}
+      </span>
+    </div>
   </div>
+
 </div>

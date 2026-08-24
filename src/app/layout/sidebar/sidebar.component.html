@@ -1,66 +1,99 @@
-<button class="btn btn-primary toggle-btn" [ngClass]="{'toggle-btn-open': isSidebarOpen}" (click)="toggleSidebar()">
-  <i [class]="isSidebarOpen ? 'fa-solid fa-times' : 'fa-solid fa-bars'"></i>
+<button
+  type="button"
+  class="sb-mobile-toggle"
+  [class.sb-mobile-toggle--open]="layout.mobileOpen()"
+  (click)="layout.toggleMobile()"
+  aria-label="فتح القائمة"
+>
+  <i [class]="layout.mobileOpen() ? 'fa-solid fa-times' : 'fa-solid fa-bars'"></i>
 </button>
 
-<aside class="sidebar" [ngClass]="{'sidebar-open': isSidebarOpen}" dir="rtl">
-  <nav class="sidebar-nav" id="sidebar">
-    <div class="sidebar-header">
-      <div class="logo" id="sidebarLogo">
-        <a routerLink="/dashboard">
-          <img src="/assets/img/logo.png" style="width: 80px;" alt="Logo" loading="lazy" />
-        </a>
-      </div>
-    </div>
+@if (layout.mobileOpen()) {
+<div class="sb-backdrop" (click)="layout.closeMobile()"></div>
+}
 
-    <!-- قائمة التنقل -->
+<nav class="sidebar" [class.collapsed]="layout.collapsed()" [class.open]="layout.mobileOpen()" dir="rtl">
+
+  <!-- Brand -->
+  <div class="sb-brand">
+    <a routerLink="/dashboard" class="sb-logo-link" (click)="layout.closeMobile()">
+      <img src="/assets/img/logo.png" class="sb-logo" alt="Logo" loading="lazy" />
+    </a>
     <div>
-      <ul class="nav-menu">
-        @for (item of menuItems; track $index) {
-        <li class="nav-item" [ngClass]="{'has-submenu': item.submenu, 'open': item.isOpen}">
-          @if (isLogoutItem(item)) {
-          <a (click)="logout()" class="nav-link mt-5">
-            <div style="cursor: pointer;" class="icon-text">
-              <i class="fa-solid fa-sign-out-alt"></i>
-              <span>{{ item.label }}</span>
-            </div>
-          </a>
-          } @else {
-          @if (item.submenu) {
-          <a href="#" class="nav-link" (click)="toggleSubmenu($index); $event.preventDefault()">
-            <div class="icon-text">
-              <i [class]="item.icons"></i>
-              <span>{{ item.label }}</span>
-            </div>
-          </a>
-
-          <ul class="submenu" [ngClass]="{'open': item.isOpen}">
-            @for (subItem of item.submenu; track $index) {
-            <li class="nav-item">
-              <a [routerLink]="subItem.path" class="nav-link" routerLinkActive="nav-active"
-                [routerLinkActiveOptions]="{exact: true}">
-                <div class="icon-text">
-                  <i [class]="subItem.icon"></i>
-                  <span>{{ subItem.key }}</span>
-                </div>
-              </a>
-            </li>
-            }
-          </ul>
-          } @else {
-          @if (item.path) {
-          <a [routerLink]="item.path" class="nav-link" routerLinkActive="nav-active"
-            [routerLinkActiveOptions]="{exact: false}">
-            <div class="icon-text">
-              <i [class]="item.icons"></i>
-              <span>{{ item.label }}</span>
-            </div>
-          </a>
-          }
-          }
-          }
-        </li>
-        }
-      </ul>
+      <span class="sb-brand-name">استشرني</span>
+      <div class="sb-brand-sub">لوحة التحكم</div>
     </div>
-  </nav>
-</aside>
+  </div>
+
+  <!-- Scrollable nav -->
+  <div class="sb-scroll">
+    @for (section of visibleSections(); track section.label) {
+    <p class="sb-sec">{{ section.label }}</p>
+
+    @for (item of section.items; track item.id) {
+      @if (item.children) {
+        <!-- Accordion group -->
+        <button type="button" class="sbi sbi--group" [class.expanded]="isGroupExpanded(item)"
+          (click)="toggleGroup(item)" [title]="layout.collapsed() ? item.label : ''">
+          <span class="sbi-icon-wrap">
+            <app-nav-icon [name]="item.icon" [size]="17"></app-nav-icon>
+          </span>
+          <span class="sbi-label">{{ item.label }}</span>
+          <i class="fa-solid fa-chevron-down sbi-caret"></i>
+        </button>
+
+        <div class="sbi-children" [class.sbi-children--open]="isGroupExpanded(item)">
+          <div class="sbi-children-inner">
+            @for (child of item.children; track child.id) {
+            <a class="sbi sbi--child" [routerLink]="child.route" routerLinkActive="on"
+              [routerLinkActiveOptions]="{exact: true}"
+              [title]="layout.collapsed() ? child.label : ''" (click)="layout.closeMobile()">
+              <span class="sbi-icon-wrap">
+                <app-nav-icon [name]="child.icon" [size]="15"></app-nav-icon>
+              </span>
+              <span class="sbi-label">{{ child.label }}</span>
+              @if (child.badge) {
+              <span [class]="getBadgeClass(child.badgeType)">{{ child.badge }}</span>
+              }
+            </a>
+            }
+          </div>
+        </div>
+      } @else {
+        <a class="sbi" [routerLink]="item.route" routerLinkActive="on"
+          [routerLinkActiveOptions]="{exact: false}"
+          [title]="layout.collapsed() ? item.label : ''" (click)="layout.closeMobile()">
+          <span class="sbi-icon-wrap">
+            <app-nav-icon [name]="item.icon" [size]="17"></app-nav-icon>
+          </span>
+          <span class="sbi-label">{{ item.label }}</span>
+          @if (item.badge) {
+          <span [class]="getBadgeClass(item.badgeType)">{{ item.badge }}</span>
+          }
+        </a>
+      }
+    }
+    }
+  </div>
+
+  <!-- Footer / logout -->
+  <div class="sb-footer">
+    <button type="button" class="sbi sbi--logout" (click)="logout()" [title]="layout.collapsed() ? 'تسجيل الخروج' : ''">
+      <span class="sbi-icon-wrap">
+        <app-nav-icon name="logout" [size]="17"></app-nav-icon>
+      </span>
+      <span class="sbi-label">تسجيل الخروج</span>
+    </button>
+  </div>
+
+  <!-- Collapse toggle (desktop only) -->
+  <button class="sb-toggle" (click)="layout.toggleCollapsed()"
+    [title]="layout.collapsed() ? 'توسيع القائمة' : 'تصغير القائمة'">
+    <svg class="sb-toggle-icon" [class.sb-toggle-icon--flipped]="layout.collapsed()" width="14" height="14"
+      viewBox="0 0 14 14" fill="none">
+      <path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span class="sb-toggle-lbl">تصغير</span>
+  </button>
+
+</nav>

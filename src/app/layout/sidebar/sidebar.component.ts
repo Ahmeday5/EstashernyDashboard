@@ -1,173 +1,85 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
+import { LayoutService } from '../../core/services/layout.service';
+import { AuthService } from '../../services/auth.service';
+import { NavIconComponent } from '../../shared/components/nav-icon/nav-icon.component';
+import { NAV_SECTIONS } from '../../core/constants/nav.constants';
+import { getBadgeClass, BadgeType } from '../../core/constants/badge.constants';
+import { NavItem } from '../../core/constants/nav.model';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterLink, RouterLinkActive, NavIconComponent],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss'],
+  styleUrl: './sidebar.component.scss',
 })
-export class SidebarComponent implements OnInit, AfterViewInit {
-  isSidebarOpen: boolean = window.innerWidth > 992;
+export class SidebarComponent {
+  protected readonly layout = inject(LayoutService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
-  menuItems: any[] = [];
+  private readonly currentUrl = signal(this.router.url);
+  private readonly currentRole = signal(this.auth.getCurrentRole());
+  /** Explicit user overrides, keyed by group id — wins over the active-route auto-expand default either way. */
+  private readonly manualOverrides = signal<ReadonlyMap<string, boolean>>(new Map());
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {}
+  constructor() {
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe(() => this.currentUrl.set(this.router.url));
 
-  ngOnInit(): void {
-    this.updateMenuItems();
-    this.authService.role$.subscribe((role) => {
-      this.updateMenuItems();
+    this.auth.role$.subscribe(() => this.currentRole.set(this.auth.getCurrentRole()));
+  }
+
+  protected readonly visibleSections = computed(() => {
+    const role = this.currentRole();
+    const filterItems = (items: NavItem[]): NavItem[] =>
+      items
+        .filter((item) => !item.allowedRoles?.length || (!!role && item.allowedRoles.includes(role)))
+        .map((item) => (item.children ? { ...item, children: filterItems(item.children) } : item))
+        .filter((item) => !item.children || item.children.length > 0);
+
+    return NAV_SECTIONS.map((section) => ({ ...section, items: filterItems(section.items) })).filter(
+      (s) => s.items.length > 0,
+    );
+  });
+
+  protected getBadgeClass(type?: BadgeType): string {
+    return getBadgeClass(type);
+  }
+
+  /**
+   * A group defaults to expanded when the active route matches one of its children (so navigating
+   * there doesn't hide it), but an explicit user click always overrides that default in either
+   * direction — otherwise a group whose page is currently open could never be manually collapsed.
+   */
+  protected isGroupExpanded(item: NavItem): boolean {
+    const override = this.manualOverrides().get(item.id);
+    if (override !== undefined) return override;
+    return !!item.children?.some((child) => this.isChildActive(child));
+  }
+
+  protected isChildActive(child: NavItem): boolean {
+    if (!child.route) return false;
+    const url = this.currentUrl().split('?')[0];
+    return url === child.route || url.startsWith(child.route + '/');
+  }
+
+  protected toggleGroup(item: NavItem): void {
+    const next = !this.isGroupExpanded(item);
+    this.manualOverrides.update((map) => {
+      const copy = new Map(map);
+      copy.set(item.id, next);
+      return copy;
     });
   }
 
-  ngAfterViewInit(): void {
-    window.addEventListener('resize', () => {
-      this.isSidebarOpen = window.innerWidth > 992;
-    });
-  }
-
-  toggleSidebar(): void {
-    this.isSidebarOpen = !this.isSidebarOpen;
-  }
-
-  // دالة تسجيل الخروج
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
-
-  isActive(path: string): boolean {
-    return path
-      ? this.router.isActive(path, {
-          paths: 'subset',
-          queryParams: 'subset',
-          fragment: 'ignored',
-          matrixParams: 'ignored',
-        })
-      : false;
-  }
-
-  // دالة للتحقق إذا كان العنصر هو زر تسجيل الخروج
-  isLogoutItem(item: any): boolean {
-    return item.label === 'تسجيل الخروج';
-  }
-
-  // دالة لفتح/إغلاق القائمة الفرعية
-  toggleSubmenu(index: number): void {
-    this.menuItems[index].isOpen = !this.menuItems[index].isOpen;
-    // تغيير حالة isOpen للعنصر المحدد بالمؤشر
-    // ده بيفتح أو يغلق القائمة الفرعية.
-  }
-
-  // قائمة العناصر في الـ Sidebar
-  // تحديث القائمة بناءً على الدور
-  // تحديث القائمة بناءً على الدور بطريقة احترافية
-  private updateMenuItems(): void {
-    const baseMenuItems = [
-      {
-        label: 'الرئيسية',
-        path: '/dashboard',
-        icons: 'fa-solid fa-house',
-        allowedRoles: ['Admin'], // متاح للجميع
-      },
-      {
-        label: 'دكتور',
-        path: null,
-        icons: 'fa-solid fa-user-md',
-        allowedRoles: ['Admin', 'Editor', 'Sales'], // Sales يحتاجها
-        submenu: [
-          {
-            key: 'جميع الأطباء',
-            path: '/alldoctor',
-            icon: 'fa-solid fa-briefcase-medical',
-          },
-          {
-            key: 'إنشاء حسابات الأطباء',
-            path: '/adddoctor',
-            icon: 'fa-solid fa-house-medical',
-          },
-        ],
-      },
-      {
-        label: 'المستخدمين',
-        path: null,
-        icons: 'fa-solid fa-users',
-        isOpen: false,
-        allowedRoles: ['Admin'], // غير متاح لـ Sales أو Marketing
-        submenu: [
-          { key: 'المستخدمين', path: '/alluser', icon: 'fa-solid fa-users' },
-          {
-            key: 'إضافة مستخدم جديد',
-            path: '/adduser',
-            icon: 'fa-solid fa-user-plus',
-          },
-        ],
-      },
-      {
-        label: 'التقارير',
-        path: '/reports',
-        icons: 'fa-solid fa-chart-bar',
-        allowedRoles: ['Admin'],
-      },
-      {
-        label: 'إضافة خصم',
-        path: '/discount',
-        icons: 'fa-solid fa-percent',
-        allowedRoles: ['Admin', 'Sales'], // Sales يحتاجها
-      },
-      {
-        label: 'التخصصات',
-        path: '/Specialities',
-        icons: 'fa-solid fa-stethoscope',
-        allowedRoles: ['Admin', 'Editor'],
-      },
-      {
-        label: 'الإشعارات',
-        path: '/notification',
-        icons: 'fa-solid fa-bell',
-        allowedRoles: ['Admin', 'Editor', 'Marketing'], // Marketing يحتاجها
-      },
-      {
-        label: 'المرضي',
-        path: '/patient',
-        icons: 'fa-solid fa-user-injured',
-        allowedRoles: ['Admin', 'Editor'],
-      },
-      {
-        label: 'الاعلانات',
-        path: '/Advertisements',
-        icons: 'fa-solid fa-bullhorn',
-        allowedRoles: ['Admin', 'Editor', 'Marketing'], // Marketing يحتاجها
-      },
-      {
-        label: 'سياسة الخصوصية',
-        path: '/privacy-policy',
-        icons: 'fa-solid fa-file-contract',
-        allowedRoles: ['Admin', 'Editor'],
-      },
-      {
-        label: 'تسجيل الخروج',
-        path: null,
-        icons: 'fa-solid fa-sign-out-alt',
-        allowedRoles: ['Admin', 'Editor', 'Sales', 'Marketing'], // متاح للجميع
-      },
-    ];
-
-    const role = this.authService.getCurrentRole();
-    if (role) {
-      // تصفية العناصر بناءً على allowedRoles
-      this.menuItems = baseMenuItems.filter((item) =>
-        item.allowedRoles.includes(role),
-      );
-    } else {
-      this.menuItems = []; // لا صلاحيات إذا لم يكن هناك دور
-    }
+  protected logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 }

@@ -1,8 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { PaginationComponent } from '../../../layout/pagination/pagination.component';
+import { ToastService } from '../../../shared/services/toast.service';
+import { ConfirmModalService } from '../../../shared/components/confirm-modal/confirm-modal.service';
 
 // تعريف واجهة للمستخدم
 interface Employee {
@@ -25,7 +28,7 @@ interface EmployeeResponse {
 @Component({
   selector: 'app-all-user',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule, RouterModule, PaginationComponent],
   templateUrl: './all-user.component.html',
   styleUrl: './all-user.component.scss',
 })
@@ -33,14 +36,18 @@ export class AllUserComponent implements OnInit {
   employees: Employee[] = []; // لتخزين بيانات المستخدمين
   displayedemployees: any[] = [];
   loading: boolean = false; // لعرض الـ Spinner أثناء التحميل
-  errorMessage: string = ''; // لعرض رسائل الخطأ
-  successMessage: string = ''; // لعرض رسائل النجاح
+  noUsersMessage: string = ''; // رسالة لو مفيش مستخدمين
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
   pages: number[] = [];
 
-  constructor(private apiService: ApiService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService,
+    private confirmModal: ConfirmModalService,
+  ) {}
 
   ngOnInit(): void {
     this.fetchEmployees();
@@ -49,21 +56,19 @@ export class AllUserComponent implements OnInit {
   // جلب جميع المستخدمين
   async fetchEmployees(): Promise<void> {
     this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.noUsersMessage = '';
 
     try {
       const response = await firstValueFrom(this.apiService.getAllUser());
       this.employees = response.employees || [];
       if (this.employees.length === 0) {
-        this.errorMessage = 'لا يوجد مستخدمين متاحين';
+        this.noUsersMessage = 'لا يوجد مستخدمين متاحين';
       }
       this.updatePagination();
       //console.log('كل الدكاترة:', data);
       this.loading = false;
     } catch (error: any) {
       console.error('فشل في جلب المستخدمين:', error);
-      this.errorMessage = error.message || 'حدث خطأ أثناء جلب المستخدمين';
     } finally {
       this.loading = false;
       this.cdr.detectChanges();
@@ -72,44 +77,39 @@ export class AllUserComponent implements OnInit {
 
   /************ delete user ******************/
   async deleteUser(id: number): Promise<void> {
-    if (!confirm('هل أنت متأكد من حذف هذا المستخدم')) {
-      return; // لو الضغط كان Cancel، يرجع بدون عمل شيء
-    }
+    const confirmed = await this.confirmModal.confirm({
+      title: 'حذف المستخدم',
+      message: 'هل أنت متأكد من حذف هذا المستخدم؟',
+      confirmLabel: 'حذف',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
     try {
       const response = await firstValueFrom(this.apiService.deleteUser(id));
-      console.log('API Response for deleteUser:', response); // طباعة الاستجابة للتحقق
       // التعامل مع الاستجابة بناءً على الرسالة بدل الاعتماد على success بس
       if (
         typeof response === 'object' &&
         response.message &&
         response.message.includes('Employee Deleted Successfully')
       ) {
-        this.successMessage =
-          response.message || 'employee Deleted Successfully';
+        this.toast.success(response.message || 'تم حذف المستخدم بنجاح');
         // حذف المستخدم من القائمة محليًا فورًا
         this.employees = this.employees.filter((s) => s.id !== id);
-        console.log('Employees after filter:', this.employees); // طباعة بعد الـ filter
         if (this.employees.length === 0) {
-          this.errorMessage = 'لا يوجد مستخدمين متاحين';
+          this.noUsersMessage = 'لا يوجد مستخدمين متاحين';
         }
-        this.cdr.detectChanges(); // تحديث الـ view فورًا
-        // اختفاء الرسالة بعد 3 ثواني
-        setTimeout(() => {
-          this.successMessage = '';
-          this.fetchEmployees();
-          this.cdr.detectChanges();
-        }, 1000);
+        this.updatePagination();
+        this.cdr.detectChanges();
       } else {
-        this.errorMessage =
+        this.toast.error(
           typeof response === 'string'
             ? response
-            : response.message || 'فشل في حذف المستخدم';
-        this.cdr.detectChanges(); // تحديث الـ view لو فيه رسالة خطأ
+            : response.message || 'فشل في حذف المستخدم',
+        );
       }
     } catch (error: any) {
-      this.errorMessage = error.message || 'حدث خطأ أثناء الحذف';
       console.error('خطأ في حذف المستخدم:', error);
-      this.cdr.detectChanges(); // تحديث الـ view لو فيه خطأ
     }
   }
 

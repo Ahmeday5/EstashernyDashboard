@@ -1,134 +1,356 @@
-.container {
-  padding-bottom: 20px;
+.edoc-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.page-title {
-  background-color: var(--second-color);
-  color: var(--thrid-color);
-  width: 32%;
-  padding: 10px;
-  text-align: center;
-  border-radius: 12px;
-  font-weight: bold;
+.edoc-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
 }
 
-.certificate {
-  position: relative;
+/* ── Header ── */
+.edoc-header {
+  padding: 26px 30px;
+  background: var(--grad);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: #fff;
 }
 
-.validcertificate {
-  position: absolute;
-  left: 65%;
-  top: 96%;
+.edoc-title {
+  margin: 0 0 6px;
+  font-size: 21px;
+  font-weight: 800;
 }
 
-.validphoto {
-  position: absolute;
+.edoc-subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-form .rowright {
-  margin-top: 3px !important;
+/* ── Grid of cards ── */
+.edoc-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 1fr;
+  gap: 18px;
+  align-items: start;
 }
 
-form .form-section {
-  margin-bottom: 15px;
+.edoc-card--wide {
+  grid-column: 1 / -1;
 }
 
-form .certificate {
-  border: 2px solid var(--second-color);
-  padding: 4px 10px;
-  background: var(--thrid-color);
-  border-radius: 12px;
-  margin-top: 40px;
+.edoc-card {
+  padding: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-form .form-section .form-label {
-  font-size: 22px;
-  font-weight: bold;
-  color: var(--second-color);
-}
-
-form .form-section .form-control,
-form .form-section .form-select {
-  background: var(--thrid-color);
-  border: 2px solid var(--second-color);
-  padding: 12px 10px;
-  border-radius: 12px;
-}
-
-form .form-section .form-control:focus,
-form .form-section .form-select:focus {
-  border-color: var(--second-color);
-  box-shadow: none;
-  outline: none;
-}
-
-form .form-section .form-control::placeholder {
-  color: rgba(109, 105, 105, 1);
-  font-family: var(--font-arabic) !important;
-  font-weight: 700;
+.edoc-card-title {
+  margin: 0 0 18px;
   font-size: 15px;
-  line-height: 100%;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
-form .btn-save {
-  width: 30%;
+/* ── Avatar / certificate card ── */
+.edoc-card--upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.edoc-avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.edoc-avatar-btn {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.edoc-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+}
+
+.edoc-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 22, 40, 0.45);
+  color: #fff;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.edoc-avatar-btn:hover .edoc-avatar-overlay {
+  opacity: 1;
+}
+
+.edoc-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.edoc-file-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.edoc-cert-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--second-color);
+  text-decoration: underline;
+}
+
+.edoc-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-color);
+  margin: 20px 0;
+}
+
+.edoc-cert-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.edoc-cert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 1.5px solid var(--second-color);
+  border-radius: var(--radius-md);
+  background: var(--second-color-light);
+  color: var(--second-color);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+
+  &:hover {
+    background: var(--second-color);
+    color: #fff;
+  }
+}
+
+/* ── Form fields ── */
+.edoc-field {
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.edoc-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+
+  .edoc-field {
+    margin-bottom: 0;
+  }
+}
+
+.edoc-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ── Submit ── */
+.edoc-submit {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.edoc-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 44px;
+  border: none;
+  border-radius: var(--radius-md);
   background: var(--second-color);
-  color: var(--thrid-color);
-  font-size: 25px;
-  padding: 0;
-  font-weight: bold;
-  border-radius: 15px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+
+  &:hover {
+    background: var(--second-color-dark);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
 }
 
-.upload-image {
-  border: none !important;
-  outline: none !important;
-  background: none;
-  padding: 0;
+/* ── Crop modal ── */
+.edoc-crop-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 20px;
 }
 
-.upload-image img {
-  border: none !important;
-  outline: none !important;
+.edoc-crop-dialog {
+  width: 100%;
+  max-width: 620px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.upload-btn {
-  border: none !important;
-  outline: none !important;
-  background: none;
-  padding: 0;
+.edoc-crop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-color);
+
+  h5 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+}
+
+.edoc-crop-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
-.upload-btn:focus,
-.upload-btn:active {
-  border: none !important;
-  outline: none !important;
+.edoc-crop-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  text-align: center;
 }
 
-@media (max-width: 1563px) {
-  .page-title {
-    width: 50%;
+.edoc-crop-preview {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  img {
+    max-height: 220px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
   }
 }
 
-@media (max-width: 992px) {
-  .page-title {
-    width: 80%;
+.edoc-crop-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--border-color);
+}
+
+.edoc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter var(--transition-fast);
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+}
+
+.edoc-btn--ghost {
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+}
+
+.edoc-btn--solid {
+  background: var(--second-color);
+  color: #fff;
+}
+
+@media (max-width: 1200px) {
+  .edoc-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .validcertificate {
-    position: absolute;
-    left: 30%;
-    top: 96%;
+  .edoc-card--upload {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .edoc-grid {
+    grid-template-columns: 1fr;
   }
 
-  form .certificate {
-    margin-top: 30px;
+  .edoc-field-row {
+    grid-template-columns: 1fr;
   }
 
-  form .btn-save {
-    width: 45%;
+  .edoc-submit-btn {
+    width: 100%;
+    justify-content: center;
   }
 }

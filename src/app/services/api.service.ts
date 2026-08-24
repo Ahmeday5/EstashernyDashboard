@@ -45,7 +45,7 @@ interface PatientResponse {
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://37.34.238.190:9292/TheOneAPIEstasherny';
+  private baseUrl = 'https://estasherny.runasp.net';
 
   constructor(private http: HttpClient) {}
 

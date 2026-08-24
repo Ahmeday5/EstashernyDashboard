@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ApiService } from '../../services/api.service'; // تأكد من المسار الصحيح
 import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../shared/services/toast.service';
 
 // تعريف واجهة للتخصصات
 interface Specialization {
@@ -54,9 +55,11 @@ export class ReportsComponent implements OnInit {
   // متغيرات التحكم في الواجهة
   loading: boolean = false; // لعرض الـ Spinner أثناء التحميل
   errorMessage: string = ''; // لعرض رسايل الخطأ
-  successMessage: string = ''; // لعرض رسايل النجاح
 
-  constructor(private apiService: ApiService) {} // حقن الـ ApiService
+  constructor(
+    private apiService: ApiService,
+    private toast: ToastService,
+  ) {}
 
   ngOnInit() {
     this.fetchSpecializations();
@@ -105,7 +108,6 @@ export class ReportsComponent implements OnInit {
   async fetchProfits(): Promise<void> {
     this.loading = true; // شغّل الـ Spinner
     this.errorMessage = ''; // مسح أي رسايل خطأ
-    this.successMessage = ''; // مسح أي رسايل نجاح
 
     try {
       const params: { [key: string]: string } = {};
@@ -115,12 +117,10 @@ export class ReportsComponent implements OnInit {
 
       const response = await firstValueFrom(this.apiService.getDoctorsDailyAndMonthlyProfit(params));
       this.profits = response.profits || []; // تخزين البيانات
-      this.successMessage = response.message; // عرض رسالة النجاح
-       setTimeout(() => {
-          this.successMessage = '';
-        }, 2000);
       if (this.profits.length === 0) {
         this.errorMessage = 'لا يوجد بيانات متاحة بناءً على الفلاتر'; // رسالة لو مفيش بيانات
+      } else {
+        this.toast.success(response.message || 'تم جلب التقرير بنجاح');
       }
     } catch (error: any) {
       console.error('فشل في جلب بيانات الأرباح:', error);

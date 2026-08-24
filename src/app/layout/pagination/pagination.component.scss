@@ -1,40 +1,140 @@
-/********* All-Padination *************/
-.All-Padination {
+.pg-bar {
   display: flex;
-  justify-content: space-around;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 16px 4px 6px;
 }
 
-/* Pagination */
-.pagination {
+.pg-summary {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+
+  strong {
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+}
+
+/* ── Page size selector ── */
+.pg-size {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
 }
 
-.pagination .page-item {
-  border: 1px solid var(--second-color);
-  border-radius: 12px;
-  margin-right: 5px;
+.pg-size-label {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
-.pagination .page-item.active {
-  background: var(--second-color);
-  color: black;
+.pg-size-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.pagination .page-link {
-  border: none;
-  color: var(--third-color);
-  font-weight: bold;
-  font-size: 15px;
-  line-height: 22px;
-  vertical-align: middle;
-  box-shadow: none !important;
-  background: transparent !important;
-  transition: border 0.3s ease;
+.pg-size-select {
+  appearance: none;
+  padding: 6px 30px 6px 12px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--main-color);
+  }
 }
 
-.ellipsis {
-  color: #6c757d;
-  cursor: default;
+.pg-size-caret {
+  position: absolute;
+  left: 10px;
+  font-size: 9px;
+  color: var(--text-muted);
   pointer-events: none;
+}
+
+/* ── Nav ── */
+.pg-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pg-btn {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+
+  &:hover:not(:disabled) {
+    background: var(--second-color-light);
+    color: var(--second-color);
+    border-color: var(--second-color-light);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pg-btn--active {
+  background: var(--second-color);
+  border-color: var(--second-color);
+  color: #fff;
+
+  &:hover {
+    background: var(--second-color-dark) !important;
+    border-color: var(--second-color-dark) !important;
+    color: #fff !important;
+  }
+}
+
+.pg-btn--jump {
+  color: var(--text-muted);
+}
+
+.pg-ellipsis {
+  width: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+@media (max-width: 576px) {
+  .pg-bar {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .pg-size {
+    margin-inline-start: 0;
+  }
+
+  .pg-btn {
+    min-width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
 }

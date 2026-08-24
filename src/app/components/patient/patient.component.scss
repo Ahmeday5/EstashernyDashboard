@@ -1,114 +1,134 @@
-/*******************search***********/
+.pt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
-.search-container {
-  max-width: 80%;
-  margin: 0 auto;
+/* ── Search ── */
+.pt-search {
   position: relative;
+  max-width: 420px;
 }
 
-.form-control {
-  border-radius: 10px;
-  padding: 10px 40px 10px 20px; /* مساحة إضافية للأيقونة */
-  border: 3px solid var(--second-color);
-  font-size: 20px;
-  height: 45px;
-  box-shadow: none;
-  background: var(--thrid-color);
+.pt-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 42px 0 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-surface);
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 4px var(--main-color-light);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
 }
 
-.form-control:focus {
-  border-color: var(--second-color);
-  box-shadow: none;
-  outline: none;
-}
-.search-icon {
+.pt-search-icon {
   position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6c757d;
-  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
-/*******************alert*************************/
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
+/* ── States ── */
+.pt-loading {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
 }
 
-.icons-alert {
-  height: 50px;
-  width: 50px;
-  margin-left: 7px;
+.pt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: var(--text-muted);
+
+  i {
+    font-size: 36px;
+    color: var(--border-color);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
 }
 
-.title-alert {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--second-color);
+/* ── Table card ── */
+.pt-card {
+  padding: 8px 20px 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-/**************table********************/
+.pt-table {
+  margin-bottom: 0;
 
-.custom-table {
-  border-collapse: separate;
-  /* لفصل الصفوف */
-  border-spacing: 0 8px;
-  /* مسافة بين الصفوف */
-  width: 100%;
+  th,
+  td {
+    white-space: nowrap;
+    font-size: 13.5px;
+    padding: 14px 12px;
+  }
 
-  font-size: 18px;
-}
-
-.custom-table th,
-.custom-table td {
-  text-align: center;
-  border-right: 2px solid var(--second-color);
-  border-bottom: 2px solid var(--second-color);
-  vertical-align: middle;
-  padding: 10px;
+  td {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
 }
 
-.custom-table th:last-child,
-.custom-table td:last-child {
-  border-left: 2px solid var(--second-color);
+.pt-patient-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.custom-table thead th {
-  background-color: var(--thrid-color);
-  color: var(--second-color);
-  font-weight: bold;
-  border-top: 2px solid var(--second-color);
+.pt-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
 }
 
-.custom-table tbody td {
-  background-color: var(--thrid-color);
-  color: var(--second-color);
-  font-weight: bold;
-  border-top: 2px solid var(--second-color);
+.pt-name {
+  font-weight: 700;
 }
 
-.custom-table tbody tr td:first-child {
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-.custom-table tbody tr td:last-child {
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-}
-.custom-table thead tr th:first-child {
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-.custom-table thead tr th:last-child {
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
+.pt-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-size: 12px;
+  font-weight: 700;
 }
 
-/*********responsive************/
+.pt-status--off {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
 
 @media (max-width: 992px) {
-  .custom-table {
-    font-size: 12px;
+  .pt-search {
+    max-width: 100%;
   }
 }

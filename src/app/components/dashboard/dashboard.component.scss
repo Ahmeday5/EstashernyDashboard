@@ -1,79 +1,258 @@
-/****************************bg***************************/
-
-.bg {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  border-radius: 10px;
-  padding: 0 15px;
-  width: 80%;
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
 }
 
-.bg .imgs {
-  text-align: left;
+/* ── Hero / greeting ── */
+.dash-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 32px 34px;
+  border-radius: var(--radius-lg);
+  background: var(--grad);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
 }
 
-.bg .content {
-  color: var(--thrid-color);
+.dash-hero-text {
+  position: relative;
+  z-index: 1;
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 440px;
+    line-height: 1.7;
+  }
 }
 
-.bg .content h5 {
-  margin-bottom: 10px;
-  font-weight: 500;
-  font-style: Medium;
-  font-size: 23px;
-  line-height: 53.5px;
+.dash-hero-art {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 88% 20%, rgba(255, 255, 255, 0.16), transparent 42%),
+    radial-gradient(circle at 96% 90%, rgba(255, 255, 255, 0.1), transparent 38%);
+  pointer-events: none;
 }
 
-/*********************cards****************/
-.cardParent .card-body {
-  padding: 10px;
+/* ── KPI cards ── */
+.dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
 
-.cards {
-  padding: 0 30px;
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
 }
 
-.card {
-  border: 2px solid var(--second-color);
-  background: var(--third-color);
-  border-radius: 12px;
+.kpi-card--skeleton {
+  height: 92px;
+  background: linear-gradient(90deg, var(--bg-muted) 25%, #ececf4 37%, var(--bg-muted) 63%);
+  background-size: 400% 100%;
+  animation: kpi-shimmer 1.4s ease infinite;
 }
 
-.card .icon-container {
-  margin-left: 20px; // مسافة بسيطة بين النص والأيقونة
+@keyframes kpi-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
 }
 
-.card .card-body .icon-container img {
-  width: 35px;
+.kpi-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
 }
 
-.card .card-body .text-content {
-  flex: 1; // يخلي النص ياخد المساحة المتاحة
+.kpi-card--teal .kpi-icon {
+  background: var(--main-color-light);
+  color: var(--main-color-dark);
+}
+
+.kpi-card--indigo .kpi-icon {
+  background: var(--second-color-light);
   color: var(--second-color);
 }
 
-.card .card-title,
-.card .card-textleft {
-  font-weight: bold;
-  font-size: 25px;
-  line-height: 100%;
-  letter-spacing: 0.5px;
+.kpi-card--amber .kpi-icon {
+  background: var(--color-warning-bg);
+  color: #a56a00;
 }
 
-.card .card-textleft {
-  margin: 0 15px 0 0;
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.card .card-textright {
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.kpi-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-success);
+
+  i {
+    font-size: 10px;
+  }
+}
+
+/* ── Charts ── */
+.dash-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.chart-card {
+  padding: 22px 24px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-title {
+  margin: 0 0 8px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* ── Section title ── */
+.dash-section-title {
   font-size: 15px;
-  font-weight: 500;
-  color: var(--main-color);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 4px;
 }
 
+/* ── Quick links ── */
+.dash-quicklinks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.ql-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-weight: 700;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+
+  i {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 17px;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    color: var(--text-primary);
+  }
+}
+
+.ql-card--indigo i {
+  background: var(--second-color-light);
+  color: var(--second-color);
+}
+
+.ql-card--teal i {
+  background: var(--main-color-light);
+  color: var(--main-color-dark);
+}
+
+.ql-card--amber i {
+  background: var(--color-warning-bg);
+  color: #a56a00;
+}
+
+.ql-card--rose i {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
 
 @media (max-width: 992px) {
-  .bg {
-    padding: 15px;
+  .dash-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-quicklinks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dash-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 26px 22px;
   }
 }

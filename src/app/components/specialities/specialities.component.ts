@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../shared/services/toast.service';
+import { ConfirmModalService } from '../../shared/components/confirm-modal/confirm-modal.service';
+import { staggerInAnimation } from '../../core/animations/list.animations';
 
 @Component({
   selector: 'app-specialities',
@@ -10,6 +13,7 @@ import { firstValueFrom } from 'rxjs';
   imports: [CommonModule, FormsModule],
   templateUrl: './specialities.component.html',
   styleUrl: './specialities.component.scss',
+  animations: [staggerInAnimation],
 })
 export class SpecialitiesComponent implements OnInit {
   @ViewChild('form') form!: NgForm;
@@ -21,10 +25,12 @@ export class SpecialitiesComponent implements OnInit {
   nospecialitiesMessage: string | null = null; // رسالة لو مفيش تخصصات
 
   Specialty = { name: '', imageUrl: '' };
-  errorMessage: string = '';
-  successMessage: string = '';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private toast: ToastService,
+    private confirmModal: ConfirmModalService,
+  ) {}
 
   ngOnInit() {
     this.fetchSpecialities(); // استدعاء التخصصات في البداية
@@ -51,8 +57,7 @@ export class SpecialitiesComponent implements OnInit {
       );
 
       if (response.success) {
-        // ✅ رسالة نجاح
-        this.successMessage = 'Specialty Added Successfully';
+        this.toast.success('تمت إضافة التخصص بنجاح');
 
         // ✅ إعادة ضبط النموذج
         this.form.resetForm();
@@ -62,22 +67,10 @@ export class SpecialitiesComponent implements OnInit {
 
         // ✅ تحديث القائمة بعد الإضافة
         setTimeout(() => this.fetchSpecialities(), 500);
-
-        // ✅ اختفاء الرسالة بعد 3 ثواني
-        setTimeout(() => {
-          this.successMessage = '';
-          this.errorMessage = '';
-        }, 3000);
       } else {
-        // ❌ رسالة خطأ من السيرفر
-        this.errorMessage = response.message || 'فشل في إضافة التخصص';
-        setTimeout(() => {
-          this.errorMessage = '';
-        }, 3000);
+        this.toast.error(response.message || 'فشل في إضافة التخصص');
       }
     } catch (error: any) {
-      // ⚠️ التعامل مع الأخطاء
-      this.errorMessage = error.message || 'حدث خطأ أثناء الإرسال';
       console.error('خطأ في إضافة التخصص:', error);
     }
   }
@@ -107,33 +100,28 @@ export class SpecialitiesComponent implements OnInit {
 
   /*************************delete AllSpecialities ***********************/
 
-  deleteSpeciality(id: number) {
-    if (confirm('هل أنت متأكد أنك تريد حذف هذا التخصص؟')) {
-      this.apiService.deleteSpecialty(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.successMessage =
-              response.message || 'Specialty deleted successfully';
-            this.errorMessage = '';
+  async deleteSpeciality(id: number) {
+    const confirmed = await this.confirmModal.confirm({
+      title: 'حذف التخصص',
+      message: 'هل أنت متأكد أنك تريد حذف هذا التخصص؟',
+      confirmLabel: 'حذف',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
-            // ✅ نحذف التخصص من المصفوفة مباشرة بدون Refresh
-            this.specialities = this.specialities.filter((s) => s.id !== id);
-
-            // ✅ نخفي الرسالة بعد 3 ثواني
-            setTimeout(() => (this.successMessage = ''), 3000);
-          } else {
-            this.errorMessage = response.message || 'فشل في حذف التخصص';
-            this.successMessage = '';
-            setTimeout(() => (this.errorMessage = ''), 3000);
-          }
-        },
-        error: (error) => {
-          console.error('❌ خطأ أثناء حذف التخصص:', error);
-          this.errorMessage = error.message || 'حدث خطأ أثناء حذف التخصص';
-          this.successMessage = '';
-          setTimeout(() => (this.errorMessage = ''), 3000);
-        },
-      });
-    }
+    this.apiService.deleteSpecialty(id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toast.success(response.message || 'تم حذف التخصص بنجاح');
+          // ✅ نحذف التخصص من المصفوفة مباشرة بدون Refresh
+          this.specialities = this.specialities.filter((s) => s.id !== id);
+        } else {
+          this.toast.error(response.message || 'فشل في حذف التخصص');
+        }
+      },
+      error: (error) => {
+        console.error('❌ خطأ أثناء حذف التخصص:', error);
+      },
+    });
   }
 }

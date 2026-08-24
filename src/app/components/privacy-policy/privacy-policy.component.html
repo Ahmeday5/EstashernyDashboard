@@ -1,38 +1,36 @@
-<div class="container-fluid p-3">
-  <!-- اختيار الصفحة للعرض -->
-  <div class="mb-3">
-    <label for="pageSelect" class="form-label">اختر الصفحة للعرض:</label>
-    <select class="form-select w-auto" [ngModel]="selectedPageType" (ngModelChange)="selectedPageTypeChanged($event)">
+<div class="pp-page">
+
+  <div class="pp-header">
+    <div>
+      <h1 class="pp-title">سياسة الخصوصية</h1>
+      <p class="pp-subtitle">عرض وتعديل صفحات السياسات المعروضة للمستخدمين</p>
+    </div>
+    <button class="pp-edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" (click)="openModal(selectedPageType)">
+      <i class="fa-solid fa-pen"></i> تعديل المحتوى
+    </button>
+  </div>
+
+  <div class="pp-toolbar">
+    <label for="pageSelect" class="pp-toolbar-label">اختر الصفحة للعرض</label>
+    <select id="pageSelect" class="form-select pp-select" [ngModel]="selectedPageType" (ngModelChange)="selectedPageTypeChanged($event)">
       <option [value]="1">خصوصية الدكاترة</option>
       <option [value]="2">خصوصية المرضى</option>
     </select>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="d-flex justify-content-center my-5">
+  @if (loading) {
+  <div class="pp-loading">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
-
-  <div class="row">
-    <div class="col-lg-8">
-      <!-- عرض المحتوى -->
-      <div *ngIf="!loading" [innerHTML]="content"></div>
-    </div>
-    <div class="col-lg-4">
-      <!-- زر فتح مودال -->
-      <button class="btn btn-primary mt-3 fw-bold" data-bs-toggle="modal" data-bs-target="#editModal"
-        (click)="openModal(selectedPageType)">
-        تعديل المحتوى
-      </button>
-    </div>
-  </div>
+  } @else {
+  <div class="pp-content-card" [innerHTML]="content"></div>
+  }
 
   <!-- Modal Bootstrap -->
-
   <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content" *ngIf="editorContent !== null">
-        <div class="modal-header">
+      <div class="modal-content pp-modal" *ngIf="editorContent !== null">
+        <div class="modal-header pp-modal-header">
           <h5 class="modal-title">تعديل الصفحة</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
@@ -47,11 +45,14 @@
             </div>
           </ng-template>
         </div>
-        <div class="modal-footer">
-          <span class="text-success me-auto">{{successMessage}}</span>
-          <span class="text-danger me-auto">{{errorMessage}}</span>
-          <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">إلغاء</button>
-          <button type="button" class="btn btn-primary fw-bold" [disabled]="updating" (click)="saveContent()">
+        <div class="modal-footer pp-modal-footer">
+          <button type="button" class="pp-btn pp-btn--ghost" data-bs-dismiss="modal">إلغاء</button>
+          <button type="button" class="pp-btn pp-btn--solid" [disabled]="updating" (click)="saveContent()">
+            @if (updating) {
+            <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+            <i class="fa-solid fa-check"></i>
+            }
             حفظ
           </button>
         </div>

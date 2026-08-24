@@ -6,16 +6,22 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { NgwWowService } from 'ngx-wow';
 import { HeaderComponent } from './layout/header/header.component';
+import { LayoutService } from './core/services/layout.service';
+import { ConfirmModalComponent } from './shared/components/confirm-modal/confirm-modal.component';
+import { routeFadeAnimation } from './core/animations/route.animations';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, SidebarComponent, HeaderComponent],
+  imports: [RouterOutlet, CommonModule, SidebarComponent, HeaderComponent, ConfirmModalComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  animations: [routeFadeAnimation],
 })
 export class AppComponent {
   title = 'Estasheny-dashboard';
+
+  protected readonly layout = inject(LayoutService);
 
   isLoggedIn$: Observable<boolean>;
 
@@ -39,5 +45,9 @@ export class AppComponent {
           this.router.navigate(['/login']);
         }
       });
+  }
+
+  protected getRouteAnimationKey(outlet: RouterOutlet): string {
+    return outlet.isActivated ? outlet.activatedRoute.snapshot.url.join('/') : '';
   }
 }

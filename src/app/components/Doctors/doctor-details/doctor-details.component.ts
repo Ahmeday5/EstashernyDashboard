@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../shared/services/toast.service';
+import { ConfirmModalService } from '../../../shared/components/confirm-modal/confirm-modal.service';
 
 @Component({
   selector: 'app-doctor-details',
@@ -16,7 +18,6 @@ export class DoctorDetailsComponent {
   doctor: any = {};
   loading: boolean = true;
   errorMessage: string | null = null;
-  successMessage: string | null = null;
   isAdmin: boolean = false;
   selectedImage: string | null = null;
 
@@ -24,7 +25,9 @@ export class DoctorDetailsComponent {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService,
+    private confirmModal: ConfirmModalService,
   ) {}
   //هنا هنستخدم الـ ActivatedRoute عشان نجيب الـ id من الـ URL، ونستدعي الـ API عشان نجيب بيانات الدكتور.
 
@@ -77,97 +80,102 @@ export class DoctorDetailsComponent {
   // دالة لحذف الدكتور مع تأكيد
   async onDelete() {
     if (!this.isAdmin) {
-      alert('ليس لديك صلاحية لحذف الدكتور');
+      this.toast.error('ليس لديك صلاحية لحذف الدكتور');
       return;
     }
-    if (
-      confirm('هل أنت متأكد من حذف الدكتور؟ هذا الإجراء لا يمكن التراجع عنه!')
-    ) {
-      const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        try {
-          const response = await firstValueFrom(
-            this.apiService.deleteDoctor(+id)
-          );
-          if (response.success) {
-            this.router.navigate(['/alldoctor']); // التنقل فورًا بعد النجاح
-            this.errorMessage = null; // مسح رسالة الخطأ
-          } else {
-            this.errorMessage = response.message || 'فشل في حذف الدكتور';
-          }
-        } catch (error) {
-          this.errorMessage = 'فشل في حذف الدكتور';
-          console.error('خطأ في حذف الدكتور:', error);
-        }
+
+    const confirmed = await this.confirmModal.confirm({
+      title: 'حذف الدكتور',
+      message: 'هل أنت متأكد من حذف الدكتور؟ هذا الإجراء لا يمكن التراجع عنه!',
+      confirmLabel: 'حذف',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.toast.error('معرف الدكتور غير موجود');
+      return;
+    }
+
+    try {
+      const response = await firstValueFrom(this.apiService.deleteDoctor(+id));
+      if (response.success) {
+        this.toast.success('تم حذف الدكتور بنجاح');
+        this.router.navigate(['/alldoctor']);
       } else {
-        this.errorMessage = 'معرف الدكتور غير موجود';
+        this.toast.error(response.message || 'فشل في حذف الدكتور');
       }
+    } catch (error) {
+      console.error('خطأ في حذف الدكتور:', error);
     }
   }
 
   // دالة لتنشيط الدكتور مع تأكيد
   async activeDoc() {
     if (!this.isAdmin) {
-      alert('ليس لديك صلاحية تنشيط الدكتور');
+      this.toast.error('ليس لديك صلاحية تنشيط الدكتور');
       return;
     }
-    if (
-      confirm('هل أنت متأكد من تنشيط الدكتور؟!')
-    ) {
-      const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        try {
-          const response = await firstValueFrom(
-            this.apiService.activeDoctor(+id)
-          );
-          if (response.success) {
-            setTimeout(() => {
-              this.successMessage = 'تم تنشيط الدكتور بنجاح';
-            }, 1000);
-            this.router.navigate(['/alldoctor']);
-          } else {
-            this.errorMessage = response.message || 'فشل في تنشيط الدكتور';
-          }
-        } catch (error) {
-          this.errorMessage = 'فشل في تنشيط الدكتور';
-          console.error('خطأ في تنشيط الدكتور:', error);
-        }
+
+    const confirmed = await this.confirmModal.confirm({
+      title: 'تنشيط الدكتور',
+      message: 'هل أنت متأكد من تنشيط الدكتور؟',
+      confirmLabel: 'تنشيط',
+      tone: 'primary',
+    });
+    if (!confirmed) return;
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.toast.error('معرف الدكتور غير موجود');
+      return;
+    }
+
+    try {
+      const response = await firstValueFrom(this.apiService.activeDoctor(+id));
+      if (response.success) {
+        this.toast.success('تم تنشيط الدكتور بنجاح');
+        this.router.navigate(['/alldoctor']);
       } else {
-        this.errorMessage = 'معرف الدكتور غير موجود';
+        this.toast.error(response.message || 'فشل في تنشيط الدكتور');
       }
+    } catch (error) {
+      console.error('خطأ في تنشيط الدكتور:', error);
     }
   }
 
   // دالة لحظر الدكتور مع تأكيد
   async inactiveDoc() {
     if (!this.isAdmin) {
-      alert('ليس لديك صلاحية حظر الدكتور');
+      this.toast.error('ليس لديك صلاحية حظر الدكتور');
       return;
     }
-    if (
-      confirm('هل أنت متأكد من حظر الدكتور؟!')
-    ) {
-      const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        try {
-          const response = await firstValueFrom(
-            this.apiService.inactiveDoctor(+id)
-          );
-          if (response.success) {
-            setTimeout(() => {
-              this.successMessage = 'تم حظر الدكتور بنجاح';
-            }, 1000);
-            this.router.navigate(['/alldoctor']);
-          } else {
-            this.errorMessage = response.message || 'فشل في حظر الدكتور';
-          }
-        } catch (error) {
-          this.errorMessage = 'فشل في حظر الدكتور';
-          console.error('خطأ في حظر الدكتور:', error);
-        }
+
+    const confirmed = await this.confirmModal.confirm({
+      title: 'حظر الدكتور',
+      message: 'هل أنت متأكد من حظر الدكتور؟',
+      confirmLabel: 'حظر',
+      tone: 'warning',
+    });
+    if (!confirmed) return;
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.toast.error('معرف الدكتور غير موجود');
+      return;
+    }
+
+    try {
+      const response = await firstValueFrom(this.apiService.inactiveDoctor(+id));
+      if (response.success) {
+        this.toast.success('تم حظر الدكتور بنجاح');
+        this.router.navigate(['/alldoctor']);
       } else {
-        this.errorMessage = 'معرف الدكتور غير موجود';
+        this.toast.error(response.message || 'فشل في حظر الدكتور');
       }
+    } catch (error) {
+      console.error('خطأ في حظر الدكتور:', error);
     }
   }
 

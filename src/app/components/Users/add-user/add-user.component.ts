@@ -7,9 +7,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../../services/api.service';
 import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../../shared/services/toast.service';
 @Component({
   selector: 'app-add-user',
   standalone: true,
@@ -35,14 +36,13 @@ export class AddUserComponent {
     ProfileImage: null as File | null,
   };
 
-  errorMessage: string = '';
-  successMessage: string = '';
   doctorImagePreview: string = '/assets/img/doctors/upload.png'; // متغير جديد لعرض الصورة المؤقتة
 
   constructor(
     private http: HttpClient,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toast: ToastService,
   ) {}
 
   triggerFileInput(): void {
@@ -71,13 +71,9 @@ export class AddUserComponent {
     }
 
     if (!this.user.ProfileImage) {
-      this.errorMessage = 'يرجى رفع صورة المستخدم ';
-      this.cdr.detectChanges();
+      this.toast.error('يرجى رفع صورة المستخدم');
       return;
     }
-
-    this.errorMessage = '';
-    this.successMessage = '';
 
     const formData = new FormData();
     formData.append('FirstName', this.user.FirstName);
@@ -93,7 +89,7 @@ export class AddUserComponent {
       const response = await firstValueFrom(this.apiService.addUser(formData));
 
       if (response.success) {
-        this.successMessage = response.message; // "New user Added Successfully"
+        this.toast.success(response.message || 'تم إضافة المستخدم بنجاح');
         this.form.resetForm();
         this.user = {
           FirstName: '',
@@ -110,26 +106,10 @@ export class AddUserComponent {
           this.ProfileImage.nativeElement.value = '';
         }
         formElement.classList.remove('was-validated');
-        setTimeout(() => {
-          this.successMessage = '';
-          this.cdr.detectChanges();
-        }, 3000);
       } else {
-        this.errorMessage = response.message; // "Email is already registered"
+        this.toast.error(response.message || 'فشل في إضافة المستخدم');
       }
     } catch (error: any) {
-      // التعامل مع الـ error اللي بيرجع من الـ Service
-      let errorMessage = 'حدث خطأ أثناء الإرسال';
-      if (error && typeof error === 'object' && 'message' in error) {
-        errorMessage = error.message; // "Email is already registered"
-      } else if (
-        error instanceof HttpErrorResponse &&
-        error.error &&
-        typeof error.error === 'string'
-      ) {
-        errorMessage = error.error; // "Email is already registered"
-      }
-      this.errorMessage = errorMessage;
       console.error('خطأ في إضافة المستخدم:', error);
     } finally {
       this.cdr.detectChanges();

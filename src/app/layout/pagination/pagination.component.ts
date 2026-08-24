@@ -1,95 +1,105 @@
 import {
+  ChangeDetectionStrategy,
   Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnChanges,
-  SimpleChanges,
+  computed,
+  input,
+  output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-interface PaginationItem {
+interface PageItem {
   type: 'page' | 'ellipsis';
   value?: number;
 }
 
+const DEFAULT_PAGE_SIZE_OPTIONS = [10, 12, 25, 50, 100, 200];
+
+/**
+ * Self-contained pagination bar: results summary ("عرض X–Y من Z"), a page-size
+ * selector, and page navigation (first/prev/numbers/next/last). `totalPages` is
+ * derived internally from `totalItems`/`pageSize` — callers never compute it.
+ * Renders nothing when `totalItems` is 0; the nav row itself only appears once
+ * there's more than one page (the summary + size selector still show for a
+ * single page, matching how large SaaS tables behave).
+ */
 @Component({
   selector: 'app-pagination',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.scss',
 })
-export class PaginationComponent implements OnChanges {
-  @Input() currentPage: number = 1;
-  @Input() totalPages: number = 0;
-  @Input() windowSize: number = 2;
+export class PaginationComponent {
+  currentPage = input(1);
+  totalItems = input(0);
+  pageSize = input(10);
+  pageSizeOptions = input<number[]>(DEFAULT_PAGE_SIZE_OPTIONS);
+  showPageSizeSelector = input(true);
+  /** How many page numbers to show on each side of the current page before collapsing to an ellipsis. */
+  windowSize = input(2);
 
-  @Output() pageChange = new EventEmitter<number>();
+  pageChange = output<number>();
+  pageSizeChange = output<number>();
 
-  pages: PaginationItem[] = [];
+  protected readonly totalPages = computed(() => {
+    const size = this.pageSize();
+    return size > 0 ? Math.max(1, Math.ceil(this.totalItems() / size)) : 1;
+  });
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['currentPage'] || changes['totalPages']) {
-      this.pages = this.getVisiblePages();
+  protected readonly startItem = computed(() =>
+    this.totalItems() === 0
+      ? 0
+      : (this.currentPage() - 1) * this.pageSize() + 1,
+  );
+
+  protected readonly endItem = computed(() =>
+    Math.min(this.currentPage() * this.pageSize(), this.totalItems()),
+  );
+
+  protected readonly pages = computed<PageItem[]>(() => this.buildPages());
+
+  protected go(page: number): void {
+    const tp = this.totalPages();
+    if (page >= 1 && page <= tp && page !== this.currentPage()) {
+      this.pageChange.emit(page);
     }
   }
 
-  // دالة لحساب الصفحات المرئية
-  getVisiblePages(): PaginationItem[] {
-    const visiblePages: PaginationItem[] = [];
-
-    // لو الصفحات قليلة (أقل من أو تساوي 2 * windowSize + 1)، اعرض كلها
-    if (this.totalPages <= 2 * this.windowSize + 1) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        visiblePages.push({ type: 'page', value: i });
-      }
-      return visiblePages;
+  protected onPageSizeSelect(value: string): void {
+    const size = Number(value);
+    if (size > 0 && size !== this.pageSize()) {
+      this.pageSizeChange.emit(size);
     }
-
-    // أضف الصفحة الأولى دائمًا
-    visiblePages.push({ type: 'page', value: 1 });
-
-    // حساب بداية النافذة حول الصفحة الحالية
-    let start = Math.max(2, this.currentPage - this.windowSize);
-    let end = Math.min(this.totalPages - 1, this.currentPage + this.windowSize);
-
-    // لو الصفحة الحالية قريبة من البداية، زد النافذة لليمين
-    if (this.currentPage <= this.windowSize + 1) {
-      end = 2 * this.windowSize + 1;
-    }
-    // لو قريبة من النهاية، زد النافذة للشمال
-    else if (this.currentPage >= this.totalPages - this.windowSize) {
-      start = this.totalPages - 2 * this.windowSize;
-    }
-
-    // أضف النقاط لو فيه فجوة بين 1 والنافذة
-    if (start > 2) {
-      visiblePages.push({ type: 'ellipsis' });
-    }
-
-    // أضف الصفحات في النافذة
-    for (let i = start; i <= end; i++) {
-      visiblePages.push({ type: 'page', value: i });
-    }
-
-    // أضف النقاط لو فيه فجوة بين النافذة والنهاية
-    if (end < this.totalPages - 1) {
-      visiblePages.push({ type: 'ellipsis' });
-    }
-
-    // أضف الصفحة الأخيرة دائمًا
-    if (this.totalPages > 1) {
-      visiblePages.push({ type: 'page', value: this.totalPages });
-    }
-
-    return visiblePages;
   }
 
- // دالة لتغيير الصفحة (مع التحقق من الـ Type وإرسال الحدث)
-  onPageChange(page: number | undefined): void {
-    if (typeof page === 'number' && page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-      this.pageChange.emit(page); // إرسال الحدث للـ parent component
+  private buildPages(): PageItem[] {
+    const items: PageItem[] = [];
+    const cp = this.currentPage();
+    const tp = this.totalPages();
+    const ws = this.windowSize();
+
+    if (tp <= 2 * ws + 1) {
+      for (let i = 1; i <= tp; i++) items.push({ type: 'page', value: i });
+      return items;
     }
+
+    items.push({ type: 'page', value: 1 });
+
+    let start = Math.max(2, cp - ws);
+    let end = Math.min(tp - 1, cp + ws);
+    if (cp <= ws + 1) {
+      end = 2 * ws + 1;
+    } else if (cp >= tp - ws) {
+      start = tp - 2 * ws;
+    }
+
+    if (start > 2) items.push({ type: 'ellipsis' });
+    for (let i = start; i <= end; i++) items.push({ type: 'page', value: i });
+    if (end < tp - 1) items.push({ type: 'ellipsis' });
+    items.push({ type: 'page', value: tp });
+
+    return items;
   }
 }

@@ -1,46 +1,61 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
-import { CommonModule } from '@angular/common'; // جلب أدوات مشتركة
-
-import { HttpClient } from '@angular/common/http'; // استيراد خدمة HTTP لجلب البيانات
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { NgApexchartsModule, ApexChart, ApexAxisChartSeries, ApexNonAxisChartSeries } from 'ng-apexcharts';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { forkJoin } from 'rxjs';
-
-/*interface StatResponse {
-  total: number;
-}*/
+import { NavIconComponent, NavIconName } from '../../shared/components/nav-icon/nav-icon.component';
+import { CountUpDirective } from '../../shared/directives/count-up.directive';
+import { staggerInAnimation } from '../../core/animations/list.animations';
 
 interface CardStat {
   id: number;
   label: string;
   value: number;
   valueToday: number;
-  imgIcon: string;
+  icon: NavIconName;
+  tone: 'teal' | 'indigo' | 'amber';
+  isCurrency?: boolean;
 }
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule, NavIconComponent, NgApexchartsModule, CountUpDirective],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
+  animations: [staggerInAnimation],
 })
 export class DashboardComponent implements OnInit {
-  loading: boolean = false;
-  errorMessage: string | null = null; // لتخزين رسائل الخطأ
+  loading = false;
+  errorMessage: string | null = null;
   cardStats: CardStat[] = [];
+  adminName = 'أدمن';
 
-  constructor(private apiService: ApiService, private http: HttpClient) {} // حقن الخدمة
+  protected donutSeries: ApexNonAxisChartSeries = [];
+  protected readonly donutLabels = ['مواعيد', 'مرضى', 'ربح'];
+  protected readonly donutChart: ApexChart = { type: 'donut', height: 260, animations: { enabled: true, easing: 'easeinout', speed: 500 } };
+  protected readonly donutColors = ['#4b4e9c', '#14c8c7', '#f2a93c'];
+
+  protected barSeries: ApexAxisChartSeries = [];
+  protected readonly barCategories = ['مواعيد', 'مرضى', 'ربح'];
+  protected readonly barChart: ApexChart = { type: 'bar', height: 260, toolbar: { show: false }, animations: { enabled: true, easing: 'easeinout', speed: 500 } };
+
+  constructor(private apiService: ApiService, private authService: AuthService) {}
 
   ngOnInit() {
-    // دالة بتشتغل لما المكون يبقى جاهز
-    this.fetchStatsOrders(); // استدعاء الدالة اللي بتجيب البيانات
+    const userData = this.authService.getUserData();
+    if (userData?.firstName) {
+      this.adminName = userData.firstName;
+    }
+    this.fetchStatsOrders();
   }
 
   fetchStatsOrders() {
     this.loading = true;
     this.errorMessage = null;
 
-    // استخدام forkJoin لجلب جميع البيانات في وقت واحد
     forkJoin({
       totalProfit: this.apiService.getTotalProfit(),
       profitToday: this.apiService.getProfitToday(),
@@ -50,30 +65,47 @@ export class DashboardComponent implements OnInit {
       todayPatients: this.apiService.getTodayPatientsCount(),
     }).subscribe({
       next: (data) => {
-        // تعبئة الكاردات بناءً على البيانات
+        const totalAppointments = data.totalAppointments.total || 0;
+        const todayAppointments = data.todayAppointments.total || 0;
+        const totalPatients = data.totalPatients.total || 0;
+        const todayPatients = data.todayPatients.total || 0;
+        const totalProfit = data.totalProfit.total || 0;
+        const profitToday = data.profitToday.total || 0;
+
         this.cardStats = [
           {
             id: 1,
             label: 'مواعيد جديدة',
-            value: data.totalAppointments.total || 0,
-            valueToday: data.todayAppointments.total || 0,
-            imgIcon: '/assets/img/dashboard/appio.png',
+            value: totalAppointments,
+            valueToday: todayAppointments,
+            icon: 'reports',
+            tone: 'indigo',
           },
           {
             id: 2,
-            label: 'المرضي الجدد',
-            value: data.totalPatients.total || 0,
-            valueToday: data.todayPatients.total || 0,
-            imgIcon: '/assets/img/dashboard/pati.png',
+            label: 'المرضى الجدد',
+            value: totalPatients,
+            valueToday: todayPatients,
+            icon: 'patients',
+            tone: 'teal',
           },
           {
             id: 3,
             label: 'الربح',
-            value: data.totalProfit.total || 0,
-            valueToday: data.profitToday.total || 0,
-            imgIcon: '/assets/img/dashboard/profit.png',
+            value: totalProfit,
+            valueToday: profitToday,
+            icon: 'discount',
+            tone: 'amber',
+            isCurrency: true,
           },
         ];
+
+        this.donutSeries = [todayAppointments, todayPatients, profitToday];
+        this.barSeries = [
+          { name: 'اليوم', data: [todayAppointments, todayPatients, profitToday] },
+          { name: 'الإجمالي', data: [totalAppointments, totalPatients, totalProfit] },
+        ];
+
         this.loading = false;
       },
       error: (error) => {
@@ -83,22 +115,4 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
-
-  /*getStatClass(label: string): string {
-    // دالة تحدد الكلاس
-    switch (
-      label // التحقق من الملصق
-    ) {
-      case 'المبلغ المطلوب منك':
-      case 'المبلغ الصافي':
-      case 'عدد الطلبات اليوم / الشهر':
-        return 'white-div'; // خلفية بيضا
-      case 'المبلغ المستحق لك':
-      case 'عدد الموردين النشطين':
-      case 'نسبة النمو أو التراجع':
-        return 'blue-div'; // خلفية زرقا
-      default:
-        return ''; // افتراضي
-    }
-  }*/
 }

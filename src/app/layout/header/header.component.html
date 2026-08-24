@@ -1,18 +1,51 @@
-<div class="container-fluid mb-4">
-  <header class="header">
-    <div class="row d-flex" dir="ltr">
-      <div class="col-md-6 d-flex align-content-center align-items-center">
-        <div class="imgs">
-          <img [src]="userImage" alt="User Image" class="img-fluid rounded-circle" onerror="this.src='/assets/img/header/logo.png';">
-        </div>
-        <!-- الصورة بتستخدم src ديناميكي من userImage
-        onerror بيحل مشكلة لو الصورة مش موجودة أو فشل تحميلها -->
-        <div class="username mt-4">
-          <h6>{{ username }}</h6>
-          <!-- العلامة h1 بتعرض الاسم المخزن في المتغير username -->
-          <!-- عرض الصورة الشخصية أو الصورة الافتراضية -->
-        </div>
-      </div>
+<header class="app-header">
+  <div class="ah-start">
+    <button type="button" class="ah-mobile-menu" (click)="layout.toggleMobile()" aria-label="فتح القائمة">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="ah-titles">
+      <h1 class="ah-title">{{ pageTitle || 'لوحة التحكم' }}</h1>
+      @if (breadcrumbs.length > 1) {
+      <nav class="ah-breadcrumb" aria-label="breadcrumb">
+        @for (crumb of breadcrumbs; track crumb.url; let last = $last) {
+        <span class="ah-crumb" [class.ah-crumb--active]="last">{{ crumb.label }}</span>
+        @if (!last) {
+        <i class="fa-solid fa-angle-left ah-crumb-sep"></i>
+        }
+        }
+      </nav>
+      }
     </div>
-  </header>
-</div>
+  </div>
+
+  <div class="ah-end">
+    <button type="button" class="ah-icon-btn" aria-label="الإشعارات">
+      <i class="fa-regular fa-bell"></i>
+    </button>
+
+    <div class="ah-user" [class.ah-user--open]="userMenuOpen()">
+      <button type="button" class="ah-user-btn" (click)="toggleUserMenu()">
+        <img [src]="userImage" alt="User" class="ah-avatar" onerror="this.src='/assets/img/header/logo.png';" />
+        <span class="ah-user-info">
+          <span class="ah-user-name">{{ username }}</span>
+          <span class="ah-user-role">{{ roleLabel }}</span>
+        </span>
+        <i class="fa-solid fa-chevron-down ah-user-caret"></i>
+      </button>
+
+      @if (userMenuOpen()) {
+      <div class="ah-user-menu">
+        <div class="ah-user-menu-header">
+          <span class="ah-user-menu-name">{{ username }}</span>
+          <span class="ah-user-menu-role">{{ roleLabel }}</span>
+        </div>
+        <button type="button" class="ah-user-menu-item ah-user-menu-item--danger" (click)="logout()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          تسجيل الخروج
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+</header>

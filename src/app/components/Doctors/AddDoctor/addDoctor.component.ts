@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../../services/api.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -18,6 +18,7 @@ import {
   LoadedImage,
 } from 'ngx-image-cropper';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-add-doctor',
@@ -52,8 +53,6 @@ export class addDoctorComponent implements OnInit {
   };
 
   specializations: { id: number; name: string }[] = [];
-  errorMessage: string = '';
-  successMessage: string = '';
   doctorImagePreview: string = '/assets/img/doctors/upload.png'; // متغير جديد لعرض الصورة المؤقتة
   certFileName: string | null = null; // متغير لعرض اسم الملف المرفوع
 
@@ -68,6 +67,7 @@ export class addDoctorComponent implements OnInit {
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer, // 🔥 ضروري للـ preview الآمن
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -129,7 +129,7 @@ export class addDoctorComponent implements OnInit {
   }
 
   loadImageFailed(): void {
-    this.errorMessage = 'فشل تحميل الصورة، جرب صورة أخرى';
+    this.toast.error('فشل تحميل الصورة، جرب صورة أخرى');
     this.showCropModal = false;
     this.cdr.detectChanges();
   }
@@ -168,19 +168,14 @@ export class addDoctorComponent implements OnInit {
     }
 
     if (!this.doctor.doctorImageFile) {
-      this.errorMessage = 'يرجى رفع صورة الدكتور ';
-      this.cdr.detectChanges();
+      this.toast.error('يرجى رفع صورة الدكتور');
       return;
     }
 
     if (!this.doctor.certificateFile) {
-      this.errorMessage = 'يرجى رفع شهادة الدكتور ';
-      this.cdr.detectChanges();
+      this.toast.error('يرجى رفع شهادة الدكتور');
       return;
     }
-
-    this.errorMessage = '';
-    this.successMessage = '';
 
     const formData = new FormData();
     formData.append('Name', this.doctor.name);
@@ -203,7 +198,7 @@ export class addDoctorComponent implements OnInit {
       );
 
       if (response.success) {
-        this.successMessage = response.message; // "New Doctor Added Successfully"
+        this.toast.success(response.message || 'تم إضافة الدكتور بنجاح');
         this.form.resetForm();
         this.doctor = {
           name: '',
@@ -229,26 +224,10 @@ export class addDoctorComponent implements OnInit {
           this.certUpload.nativeElement.value = '';
         }
         formElement.classList.remove('was-validated');
-        setTimeout(() => {
-          this.successMessage = '';
-          this.cdr.detectChanges();
-        }, 3000);
       } else {
-        this.errorMessage = response.message; // "Email is already registered"
+        this.toast.error(response.message || 'فشل في إضافة الدكتور');
       }
     } catch (error: any) {
-      // التعامل مع الـ error اللي بيرجع من الـ Service
-      let errorMessage = 'حدث خطأ أثناء الإرسال';
-      if (error && typeof error === 'object' && 'message' in error) {
-        errorMessage = error.message; // "Email is already registered"
-      } else if (
-        error instanceof HttpErrorResponse &&
-        error.error &&
-        typeof error.error === 'string'
-      ) {
-        errorMessage = error.error; // "Email is already registered"
-      }
-      this.errorMessage = errorMessage;
       console.error('خطأ في إضافة الدكتور:', error);
     } finally {
       this.cdr.detectChanges();

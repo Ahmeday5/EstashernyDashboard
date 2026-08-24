@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { fromEvent, debounceTime, distinctUntilChanged, map } from 'rxjs';
-import { PaginationComponent } from "../../layout/pagination/pagination.component";
+import { PaginationComponent } from '../../layout/pagination/pagination.component';
 
 @Component({
   selector: 'app-patient',
@@ -13,8 +13,6 @@ import { PaginationComponent } from "../../layout/pagination/pagination.componen
   templateUrl: './patient.component.html',
   styleUrl: './patient.component.scss',
 })
-
-
 export class PatientComponent {
   patients: any[] = [];
   displayedPatients: any[] = [];
@@ -77,13 +75,18 @@ export class PatientComponent {
     this.fetchPatients(query);
   }
 
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = '/assets/img/usericon.png';
+  }
+
   setupSearchListener() {
     if (this.searchInput && this.searchInput.nativeElement) {
       fromEvent(this.searchInput.nativeElement, 'input')
         .pipe(
           debounceTime(300),
           distinctUntilChanged(),
-          map((event: Event) => (event.target as HTMLInputElement).value)
+          map((event: Event) => (event.target as HTMLInputElement).value),
         )
         .subscribe((query: string) => {
           this.onSearch(query);

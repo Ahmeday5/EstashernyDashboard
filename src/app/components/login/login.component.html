@@ -42,19 +42,13 @@
                 <i class="fa-regular {{ showPassword ? 'fa-eye-slash' : 'fa-eye' }}" style="color: #4b4e9c;"></i>
               </span>
             </div>
-            <div class="remember-content row mt-2 justify-content-between">
-              <div class="col-3">
-                <div class="remember form-check">
-                  <label class="form-check-label" for="checkDefault">
-                    تذكرني
-                  </label>
-                  <input class="form-check-input" type="checkbox" id="checkDefault" name="rememberMe"
-                    [(ngModel)]="rememberMe">
-                </div>
-              </div>
-              <div class="col-5 text-center forgetpass">
-                <a href="#" class="btn" role="button" data-bs-toggle="button">نسيت كلمة المرور؟</a>
-              </div>
+            <div class="remember-content">
+              <label class="remember" for="checkDefault">
+                <input class="remember-checkbox" type="checkbox" id="checkDefault" name="rememberMe"
+                  [(ngModel)]="rememberMe">
+                <span>تذكرني</span>
+              </label>
+              <a href="#" class="forgetpass">نسيت كلمة المرور؟</a>
             </div>
             <div class="submit text-center mt-5">
               <button type="submit" class="btn" [disabled]="isLoading || loginForm.invalid">
