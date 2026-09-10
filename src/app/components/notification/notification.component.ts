@@ -43,7 +43,7 @@ export class NotificationComponent {
     try {
       const response = await firstValueFrom(
         this.http.post<any>(
-          'http://37.34.238.190:9292/TheOneAPIEstasherny/api/notification/send',
+          'https://estasherny.runasp.net/api/notification/send',
           {
             title: this.title,
             body: this.body,
